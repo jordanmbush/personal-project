@@ -1,0 +1,1 @@
+SELECT * FROM transactions WHERE date >= $1 AND <= $2;
