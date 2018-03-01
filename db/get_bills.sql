@@ -1,0 +1,1 @@
+SELECT * FROM bills WHERE user_id = $1;

@@ -1,5 +1,5 @@
 module.exports = function(req, res, next) {
-  console.log('checkSession HIT - SESSION: ', req.session);
+  console.log('checkSession HIT');
   const user = req.session.user;
   if (!user) {
       res.status(404).json( {message: 'Unauthorized' });

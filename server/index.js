@@ -4,6 +4,7 @@ const massive = require('massive');
 const auth_controller = require('./controllers/auth_controller');
 const user_controller = require('./controllers/user_controller');
 const bill_controller = require('./controllers/bill_controller');
+const transaction_controller = require('./controllers/transaction_controller');
 // MIDDLEWARES
 const session = require('express-session');
 const bodyParser = require('body-parser');
@@ -33,6 +34,8 @@ app.get('/auth/callback', auth_controller.connect);
 app.get('/api/user-data', checkSession, user_controller.getUser);
 // app.post('/api/bills', checkSession, bill_controller.addBills)
 app.post('/api/bills', bill_controller.addBills)
+app.get('/api/bills', bill_controller.getBills);
+app.get('/api/transactions', transaction_controller.getTransactions);
 app.post('/api/logout', user_controller.logout);
 
 const PORT = 4000;

@@ -1,3 +1,33 @@
-.create-budget-entry-container {
+.bills-entry-container > * {
   margin: 10px;
+}
+
+.days-selector input {
+  display: none!important;
+}
+
+.days-selector input[type=checkbox] + label {
+  display: inline-block;
+  /* border-radius: 50%; */
+  background: #dddddd;
+  height: 40px;
+  width: 40px;
+  margin-right: 3px;
+  line-height: 40px;
+  text-align: center;
+  cursor: pointer;
+}
+
+.days-selector input[type=checkbox]:checked + label {
+  background: #2AD705;
+  color: #ffffff;
+}
+
+.month-days-selector input[type=checkbox] + label {
+  border-radius: 20%;
+  margin-top: 6px;
+}
+
+.week-days-selector input[type=checkbox] + label {
+  border-radius: 50%;
 }

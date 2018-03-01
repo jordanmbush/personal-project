@@ -6,13 +6,11 @@ export default class Dashboard extends Component {
   constructor() {
     super();
     this.state = {
-
     }
   }
 
   componentDidMount() {
     axios.get(`/api/user-data`).then( users => {
-      // MAYBE LOAD TRANSACTIONS INTO STATE 
       console.log('dashboard.js - received user data: ', users.data);
     }).catch( err => {
       // ADD CODE HERE
@@ -20,12 +18,15 @@ export default class Dashboard extends Component {
     })
   }
   
+  
+  
   render() {
 
     return (
       <div>
         Dashboard Component!!
-        <Link to='/create-budget'>Create a new Budget</Link>
+        <Link to='/create-budget'><button>Create a new Budget</button></Link>
+        <Link to='/add-transactions'><button>Add / Edit Transactions</button></Link>
       </div>
     )
   }
