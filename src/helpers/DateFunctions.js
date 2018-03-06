@@ -24,5 +24,9 @@ module.exports =  {
   getLastDayOfMonth: (date) => {
     var lastDay = new Date(date.getFullYear(), date.getMonth() + 1, 0);
     return lastDay;
-  }
+  },
+  getDaysInMonth: (year, month) => {
+    return new Date(year, month, 0).getDate();
+  },
+
 }

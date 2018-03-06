@@ -28,17 +28,11 @@ export default class Login extends Component {
     window.location = link;
   }
 
-  logout() {
-    axios.post('/api/logout').then( response => {
-
-    }).then( err => console.log('login.js - logout err: ', err));
-  }
 
   render() {
     return (
       <div className='login'>
         <button onClick={this.login}>Login / Register</button>
-        <button onClick={this.logout}>Logout</button>
       </div>
     )
   }

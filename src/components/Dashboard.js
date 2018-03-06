@@ -1,6 +1,7 @@
 import React, { Component } from 'react';
 import axios from 'axios';
 import { Link } from 'react-router-dom';
+import Header from './Header';
 
 export default class Dashboard extends Component {
   constructor() {
@@ -24,6 +25,7 @@ export default class Dashboard extends Component {
 
     return (
       <div>
+        <Header />
         Dashboard Component!!
         <Link to='/create-budget'><button>Create a new Budget</button></Link>
         <Link to='/add-transactions'><button>Add / Edit Transactions</button></Link>

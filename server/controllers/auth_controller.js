@@ -13,7 +13,6 @@ module.exports = {
       redirect_uri: `http://${req.headers.host}/auth/callback`
     }).then( accessToken => {
       return axios.get(`https://${process.env.REACT_APP_AUTH_DOMAIN}/userinfo/?access_token=${accessToken.data.access_token}`).then( userInfo => {
-        console.log('auth_controller.connect - received userInfo from auth0: ', userInfo);
         const { sub, name, email } = userInfo.data;
         let names = name.split(' ');
         let firstName = '';

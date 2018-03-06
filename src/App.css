@@ -31,3 +31,36 @@
 .week-days-selector input[type=checkbox] + label {
   border-radius: 50%;
 }
+
+td {
+  border: 1px solid black;
+}
+
+.transaction-table-balance::before {
+  content: "$";
+}
+
+.transaction-table-container {
+
+}
+
+.transaction-header-container {
+  
+}
+
+.transaction-header-container > * {
+  display: inline-block;
+}
+
+.transaction-table-row-container {
+  width: 90%;
+  display: flex;
+  justify-content: space-between;
+}
+
+.transaction-table-row-container > * {
+  display: inline-block;
+  margin: 10px;
+  border: 1px solid black;
+  min-width: 100px;
+}

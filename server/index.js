@@ -5,6 +5,8 @@ const auth_controller = require('./controllers/auth_controller');
 const user_controller = require('./controllers/user_controller');
 const bill_controller = require('./controllers/bill_controller');
 const transaction_controller = require('./controllers/transaction_controller');
+const income_controller = require('./controllers/income_controller');
+const balance_controller = require('./controllers/balance_controller');
 // MIDDLEWARES
 const session = require('express-session');
 const bodyParser = require('body-parser');
@@ -33,9 +35,14 @@ app.use(express.static(`${__dirname}/../build`));
 app.get('/auth/callback', auth_controller.connect);
 app.get('/api/user-data', checkSession, user_controller.getUser);
 // app.post('/api/bills', checkSession, bill_controller.addBills)
-app.post('/api/bills', bill_controller.addBills)
+app.post('/api/bills', bill_controller.addBills);
 app.get('/api/bills', bill_controller.getBills);
-app.get('/api/transactions', transaction_controller.getTransactions);
+app.post('/api/income', income_controller.addIncome);
+app.get('/api/income', income_controller.getIncome);
+// app.get('/api/transactions', transaction_controller.getTransactions);
+app.get('/api/transactions', transaction_controller.getAllTransactions);
+app.get('/api/balance', balance_controller.getBalance);
+
 app.post('/api/logout', user_controller.logout);
 
 const PORT = 4000;
