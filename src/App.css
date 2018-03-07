@@ -52,15 +52,52 @@ td {
   display: inline-block;
 }
 
-.transaction-table-row-container {
-  width: 90%;
+.transaction-table-row-container > *{
+  /* width: 90%; */
   display: flex;
-  justify-content: space-between;
+  justify-content: flex-start
 }
 
-.transaction-table-row-container > * {
+.transaction-table-row-container:hover > * > .toggle-transactions-button {
   display: inline-block;
-  margin: 10px;
+}
+
+.toggle-transactions-button {
+  display: none;
+  width: 25px;
+  height: 25px;
+  line-height: 25px;
+  border-radius: 50%;
+  border: none;
+  background-color: #2AD705;
+  color: white;
+  text-align: center;
+  vertical-align: middle;
+  font-weight: bold;
+  font-size: 20px;
+}
+
+.toggle-transactions-button:hover {
+  display: inline-block;
+  cursor: pointer;
+}
+
+.transaction-table-container > * > * > div {
+  display: inline-block;
+  margin: 5px 5px;
   border: 1px solid black;
-  min-width: 100px;
+  width: 100px;
+}
+
+.row-hidden {
+  display: none;
+}
+
+.row-showing {
+  width: 80%;
+  margin-left: 20px;
+}
+
+.transaction-table-entry-row {
+  /* display: none; */
 }

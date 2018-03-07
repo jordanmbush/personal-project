@@ -40,6 +40,8 @@ export default class AddTransactionsView extends Component {
     this.getEOWTransactionsFromTemplate = this.getEOWTransactionsFromTemplate.bind(this);
     this.getTemplateTransactions = this.getTemplateTransactions.bind(this);
     this.initializeTransactions = this.initializeTransactions.bind(this);
+    this.toggleTableRowVisibility = this.toggleTableRowVisibility.bind(this);
+    this.addTransaction = this.addTransaction.bind(this);
   }
 
   componentDidMount() {
@@ -253,6 +255,7 @@ export default class AddTransactionsView extends Component {
     let balanceDate = new Date(this.state.balanceInfo.date);
     let balance = null;
 
+    if(firstDayOfSelectedMonth < balanceDate)
     for(let day = new Date(firstDayOfSelectedMonth); day >= balanceDate; day.setDate(day.getDate() -1)) {
       let index = this.state.fullTransactionSet.findIndex(transaction => transaction.day.isSameDateAs(day));
       if(index !== -1) {
@@ -269,29 +272,71 @@ export default class AddTransactionsView extends Component {
       let billAmount = 0;
 
       let billsForDay = transactions.filter( bill => bill.day.isSameDateAs(day));
+      if(!billsForDay.length) {
+        billsForDay.push({ name: '', amount: 0, balance: balance });
+      }
+      // REVERSE THE BILLS FOR THAT DAY SO THAT THE LAST TRANSACTION FOR THE DAY IS ON TOP, OR FIRST. ALL TRANSACTIONS ARE HIDDEN
+      // EXCEPT THE FIRST. REVERSING THE ARRAY WILL ENSURE THAT THE LATEST BALANCE FOR THE DAY IS WHAT IS SHOWING
+      billsForDay = billsForDay.reverse();
 
-      // I HAVE A LIST OF TRANSACTIONS AT THIS POINT THAT ALREADY HAVE A BALANCE:
-      // I MAY HAVE MORE THAN ONE TRANSACTION PER DAY - WHICH WOULD BE INCLUDED IN billsForDay ABOVE. ARE THE
-      // BALANCE AMOUNTS CORRECT?
+      let dailyTransactions = [];
+      let id = DateFunctions.formatDate(day);
+      const button = <button id={id + '-toggle-button'} className='toggle-transactions-button' onClick={ e => this.toggleTableRowVisibility(e) }>+</button>;
+
       for(let i = 0; i < billsForDay.length; i++) {
         billName = billsForDay[i].name;
         billAmount = billsForDay[i].amount;
         balance = billsForDay[i].balance;
-      }
-      
-      transactionTable.push(
-        <div className='transaction-table-row-container' id={DateFunctions.formatDate(day)}>
-          <div className='transaction-table-balance'>{balance}</div>
-          <div className='transaction-table-date'>{DateFunctions.formatDate(day)}</div>
-          <div className='transaction-table-bill-name'>{billName}</div>
-          <div className='transaction-table-bill-amount'>{billAmount}</div>
-        </div>
-      );
-    }
 
+        dailyTransactions.push(
+            <div className={i === 0 ? '' : 'row-hidden'} id={`${id}-${i}`}>
+              <div className='transaction-table-balance'>{balance}</div>
+              <div className='transaction-table-date'>{DateFunctions.formatDate(day)}</div>
+              <div className='transaction-table-bill-name'>{billName}</div>
+              <div className='transaction-table-bill-amount'>{billAmount}</div>
+              {i === 0 ? button : ''}
+            </div>
+        );
+      }
+
+      transactionTable.push(
+        <div className='transaction-table-row-container' id={id}>
+          {dailyTransactions}
+          <div className='transaction-table-entry-row row-hidden' id={id + '-last'}>
+            <input placeholder="name - eg. 'Water'" ></input>
+            <input type='number' placeholder='amount' ></input>
+            <input placeholder='category'></input>
+            <label htmlFor={`${id}-radio-income`}>Income</label>
+            <input id={`${id}-radio-income`} type='radio' name={`${id}-transaction-type`}></input>
+            <label htmlFor={`${id}-radio-expense`}>Expense</label>
+            <input id={`${id}-radio-expense`} type='radio' name={`${id}-transaction-type`}></input>
+            <button id={id + '-add-button'} onClick={e => this.addTransaction(e)} >Add</button>
+          </div>
+        </div>
+      )
+    }
     return transactionTable;
   }
+
+  addTransaction(e) {
+    let id = e.target.id.replace('-add-button', '');
+
+  }
   
+  toggleTableRowVisibility(e) {
+    let id = e.target.id.replace('-toggle-button', '');
+    let children = document.getElementById(id).childNodes;
+    for(let i = 0; i < children.length; i++) {
+      let classList = children[i].className.split(' ');
+      if(classList.indexOf('row-showing') !== -1) {
+        classList.splice(classList.indexOf('row-showing'), 1, 'row-hidden');
+        children[i].className = classList.join(' ');
+      } else if(classList.indexOf('row-hidden') !== -1) {
+        classList.splice(classList.indexOf('row-hidden'), 1, 'row-showing');
+        children[i].className = classList.join(' ');
+      }
+    }
+  }
   
   render() {
     
@@ -307,7 +352,7 @@ export default class AddTransactionsView extends Component {
         </div>
         <table>
           <div className='transaction-table-container'>
-            <div className='transaction-header-container'>
+            <div className='transaction-table-header-container'>
               <div>Balance</div>
               <div>Date</div>
               <div>Name</div>
