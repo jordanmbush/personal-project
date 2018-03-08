@@ -24,5 +24,18 @@ module.exports = {
       console.log('transaction_controller - get_all_transactions err: ', err);
       res.status(500).send();
     })
+  },
+  addTransaction: (req, res) => {
+    // const { user_id } = req.session.user;
+    const user_id = 'github|34669268'; //TESTING - REMOVE!!!!!!!!!!!!!!!!!!!!!!!!!
+    const { name, amount, date, category, type } = req.body;
+    
+    const db = req.app.get('db');
+    db.add_transaction(user_id, name, amount, date, category, type).then( transaction => {
+      res.json(transaction);
+    }).catch( err => {
+      console.log('transaction_controller.js - addTransaction err: ', err);
+      res.status(500).send();
+    });
   }
 }

@@ -2,6 +2,12 @@
   margin: 10px;
 }
 
+input {
+  margin: auto 2px;
+  max-height: 20px;
+
+}
+
 .days-selector input {
   display: none!important;
 }
@@ -32,10 +38,6 @@
   border-radius: 50%;
 }
 
-td {
-  border: 1px solid black;
-}
-
 .transaction-table-balance::before {
   content: "$";
 }
@@ -58,11 +60,11 @@ td {
   justify-content: flex-start
 }
 
-.transaction-table-row-container:hover > * > .toggle-transactions-button {
+.transaction-table-row-container:hover > * > .toggle-transactions-button-show {
   display: inline-block;
 }
 
-.toggle-transactions-button {
+.toggle-transactions-button-show {
   display: none;
   width: 25px;
   height: 25px;
@@ -75,9 +77,27 @@ td {
   vertical-align: middle;
   font-weight: bold;
   font-size: 20px;
+  margin-top: auto;
+  margin-bottom: auto;
 }
 
-.toggle-transactions-button:hover {
+.toggle-transactions-button-hide {
+  width: 35px;
+  height: 25px;
+  line-height: 15px;
+  border-radius: 5px;
+  border: none;
+  background-color: rgb(220, 243, 11);
+  color: white;
+  text-align: center;
+  vertical-align: middle;
+  font-weight: bold;
+  font-size: 25px;
+  margin-top: auto;
+  margin-bottom: auto;
+}
+
+.toggle-transactions-button-show:hover {
   display: inline-block;
   cursor: pointer;
 }
@@ -86,7 +106,7 @@ td {
   display: inline-block;
   margin: 5px 5px;
   border: 1px solid black;
-  width: 100px;
+  min-width: 50px;
 }
 
 .row-hidden {
@@ -100,4 +120,26 @@ td {
 
 .transaction-table-entry-row {
   /* display: none; */
+}
+
+.income-radio {
+  background-color: rgba(55, 240, 13, 0.459);
+  border: none !important;
+  padding: 5px;
+}
+
+.expense-radio {
+  background-color: rgba(215, 117, 5, 0.568);
+  border: none !important;
+  padding: 5px;
+}
+
+.transaction-table-header-row {
+  font-weight: bold;
+  text-align: center;
+  background-color: grey;
+}
+
+.transaction-table-header-row > * {
+  border: none !important;
 }

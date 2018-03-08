@@ -1,3 +1,4 @@
+SELECT * FROM pg_catalog.pg_tables WHERE schemaname != 'pg_catalog' AND schemaname != 'information_schema';
 DROP TABLE IF EXISTS users;
 DROP TABLE IF EXISTS bills;
 DROP TABLE IF EXISTS transactions;
@@ -51,9 +52,18 @@ CREATE TABLE categories (
 DROP TABLE IF EXISTS income;
 CREATE TABLE income (
   id SERIAL PRIMARY KEY,
-  user_id TEXT REFERENCES users(user_id),
-  source TEXT NOT NULL,
-  amount NUMERIC NOT NULL
+  user_id TEXT NOT NULL REFERENCES users(user_id),
+  name TEXT NOT NULL,
+  amount NUMERIC NOT NULL,
+  frequency_type TEXT,
+  start_date DATE
+);
+
+DROP TABLE IF EXISTS income_frequencies;
+CREATE TABLE income_frequencies (
+  id SERIAL PRIMARY KEY,
+  income_id INTEGER NOT NULL REFERENCES income(id),
+  day_num INTEGER
 );
 
 DROP TABLE IF EXISTS balances;
@@ -68,12 +78,13 @@ INSERT INTO balances (user_id, date, amount)
 VALUES ('github|34669268', '2018-02-02', 500.50);
 
 SELECT * FROM users;
-SELECT * FROM bills
 SELECT * FROM balances;
+SELECT * FROM bills;
+SELECT * FROM bill_frequencies;
 FULL JOIN bill_frequencies ON (bills.id = bill_frequencies.bill_id)
 WHERE user_id = 'github|34669268';
 
-SELECT * FROM bill_frequencies;
+
 
 SELECT * FROM bill_frequencies WHERE id LIKE '%%';
 
