@@ -41,7 +41,11 @@ app.post('/api/income', income_controller.addIncome);
 app.get('/api/income', income_controller.getIncome);
 // app.get('/api/transactions', transaction_controller.getTransactions);
 app.get('/api/transactions', transaction_controller.getAllTransactions);
+app.post('/api/transactions', transaction_controller.addTransactions);
+
 app.post('/api/transaction', transaction_controller.addTransaction);
+app.delete('/api/transaction/:id', transaction_controller.deleteTransaction);
+
 app.get('/api/balance', balance_controller.getBalance);
 
 app.post('/api/logout', user_controller.logout);

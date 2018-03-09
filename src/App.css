@@ -5,7 +5,6 @@
 input {
   margin: auto 2px;
   max-height: 20px;
-
 }
 
 .days-selector input {
@@ -43,9 +42,15 @@ input {
 }
 
 .transaction-table-container {
-
+  width: 600px;
+  background-color: beige;
 }
 
+.month-navigation-buttons-container {
+  display: flex;
+  justify-content: space-between;
+  width: 600px;
+}
 .transaction-header-container {
   
 }
@@ -57,7 +62,8 @@ input {
 .transaction-table-row-container > *{
   /* width: 90%; */
   display: flex;
-  justify-content: flex-start
+  justify-content: flex-start;
+  align-items: stretch;
 }
 
 .transaction-table-row-container:hover > * > .toggle-transactions-button-show {
@@ -106,7 +112,7 @@ input {
   display: inline-block;
   margin: 5px 5px;
   border: 1px solid black;
-  min-width: 50px;
+  width: 100px;
 }
 
 .row-hidden {

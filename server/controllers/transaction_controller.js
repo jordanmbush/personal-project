@@ -37,5 +37,37 @@ module.exports = {
       console.log('transaction_controller.js - addTransaction err: ', err);
       res.status(500).send();
     });
+  },
+  addTransactions: (req, res) => { 
+    // const { user_id } = req.session.user;
+    const user_id = 'github|34669268'; //TESTING - REMOVE!!!!!!!!!!!!!!!!!!!!!!!!!
+    let transactions = req.body.transactionsArray;
+    let addedTransactions = [];
+    const db = req.app.get('db');
+    for(let i = 0; i < transactions.length; i++) {
+      const { name, amount, day, category, type } = transactions[i];
+      
+      db.add_transaction([user_id, name, amount, day, category, type]).then( transaction => {
+        addedTransactions = addedTransactions.concat(transaction);
+      }).catch( err => {
+        console.log('transaction_controller.js - addTransaction err: ', err);
+        res.status(500).send();
+      });
+    }
+
+    res.status(200).send();
+  },
+  deleteTransaction: (req, res) => {
+    // const { user_id } = req.session.user;
+    const user_id = 'github|34669268'; //TESTING - REMOVE!!!!!!!!!!!!!!!!!!!!!!!!!
+    const id = req.params.id;
+
+    const db = req.app.get('db');
+    db.delete_transaction(user_id, id).then( transaction => {
+      res.status(200).send();
+    }).catch( err => {
+      console.log('transaction_controller.js - deleteTransaction err: ', err);
+      res.status(500).send();
+    });
   }
 }
