@@ -198,7 +198,8 @@ export default class CreateBudgetView extends Component {
   changeCurrentBill(id) {
     // GET A COPY OF THE BILL OBJECT, AND SET IT AS THE currentBill OBJECT IN STATE
     let billsCopy = this.state.bills.slice();
-    id = parseInt(id.replace(/\D/g, ''))
+    // REMOVE ALL LETTERS TO GET ID
+    id = parseInt(id.replace(/\D/g, ''));
     let newCurrentBill = billsCopy.splice(id, 1)[0];
     // ADD AN ID THAT WILL REPRESENT THE BILL'S INDEX IN THE BILLS ARRAY.
     // THIS PROPERTY IS DELETED BEFORE THE BILL IS ADDED BACK TO THE BILLS ARRAY.
@@ -214,7 +215,8 @@ export default class CreateBudgetView extends Component {
   changeCurrentIncomeSource(id) {
     // GET A COPY OF THE INCOME OBJECT, AND SET IT AS THE currentIncomeSource OBJECT IN STATE
     let incomeSourcesCopy = this.state.incomeSources.slice();
-    id = parseInt(id.replace(/\D/g, ''))
+    // REMOVE ALL LETTERS TO GET ID
+    id = parseInt(id.replace(/\D/g, ''));
     let newCurrentIncomeSource = incomeSourcesCopy.splice(id, 1)[0];
     // ADD AN ID THAT WILL REPRESENT THE INCOME SOURCE'S INDEX IN THE INCOMESOURCES ARRAY.
     // THIS PROPERTY IS DELETED BEFORE THE INCOMESOURCE IS ADDED BACK TO THE ARRAY

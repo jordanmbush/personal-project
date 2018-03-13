@@ -1,13 +1,12 @@
 module.exports = {
   addIncome: (req, res) => {
     console.log('income_controller - add_income');
-    // const { user_id } = req.session.user;
-    const user_id = 'github|34669268'; //TESTING - REMOVE!!!!!!!!!!!!!!!!!!!!!!!!!
+    const { user_id } = req.session.user;
+    // const user_id = 'github|34669268'; //TESTING - REMOVE!!!!!!!!!!!!!!!!!!!!!!!!!
 
     if(req.body.income) {
       const db = req.app.get('db');
       const income = req.body.income;
-      console.log('income coming over: ', income[0]);
 
       db.delete_all_user_income(user_id).then( response => {
         // ADD EACH INCOME ENTRY
@@ -33,8 +32,8 @@ module.exports = {
     }
   },
   getIncome: (req, res) => {
-    // const { user_id } = req.session.user;
-    const user_id = 'github|34669268'; //TESTING - REMOVE!!!!!!!!!!!!!!!!!!!!!!!!!
+    const { user_id } = req.session.user;
+    // const user_id = 'github|34669268'; //TESTING - REMOVE!!!!!!!!!!!!!!!!!!!!!!!!!
     const db = req.app.get('db');
     db.get_income(user_id).then( income => {
       console.log('income_controller - get_income received: ', income);

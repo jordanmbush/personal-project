@@ -13,6 +13,14 @@ module.exports =  {
     return formattedDate;
   },
 
+  simpleDateFormat: (date) => {
+    let month = '' + (date.getMonth() + 1);
+    let day = '' + (date.getDate());
+    let year = date.getFullYear();
+
+    return `${month}/${day.toString() }/${year.toString().substring(2)}`;
+  },
+
   getMonthNum: (date) => {
     let month = date.getMonth() + 1;
   },

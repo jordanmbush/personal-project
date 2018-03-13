@@ -35,20 +35,21 @@ app.use(express.static(`${__dirname}/../build`));
 app.get('/auth/callback', auth_controller.connect);
 app.get('/api/user-data', checkSession, user_controller.getUser);
 // app.post('/api/bills', checkSession, bill_controller.addBills)
-app.post('/api/bills', bill_controller.addBills);
-app.get('/api/bills', bill_controller.getBills);
-app.post('/api/income', income_controller.addIncome);
-app.get('/api/income', income_controller.getIncome);
-// app.get('/api/transactions', transaction_controller.getTransactions);
-app.get('/api/transactions', transaction_controller.getAllTransactions);
-app.post('/api/transactions', transaction_controller.addTransactions);
+app.post('/api/bills', checkSession, bill_controller.addBills);
+app.get('/api/bills', checkSession, bill_controller.getBills);
+app.post('/api/income', checkSession, income_controller.addIncome);
+app.get('/api/income', checkSession, income_controller.getIncome);
+// app.get('/api/transactions', checkSession, transaction_controller.getTransactions);
+app.get('/api/transactions', checkSession, transaction_controller.getAllTransactions);
+app.post('/api/transactions', checkSession, transaction_controller.addTransactions);
 
-app.post('/api/transaction', transaction_controller.addTransaction);
-app.delete('/api/transaction/:id', transaction_controller.deleteTransaction);
+app.post('/api/transaction', checkSession, transaction_controller.addTransaction);
+app.put('/api/transaction', checkSession, transaction_controller.updateTransaction);
+app.delete('/api/transaction/:id', checkSession, transaction_controller.deleteTransaction);
 
-app.get('/api/balance', balance_controller.getBalance);
+app.get('/api/balance', checkSession, balance_controller.getBalance);
 
-app.post('/api/logout', user_controller.logout);
+app.post('/api/logout', checkSession, user_controller.logout);
 
 const PORT = 4000;
 app.listen( PORT, console.log(`Listening on port ${PORT}.`));

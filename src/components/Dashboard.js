@@ -11,8 +11,8 @@ export default class Dashboard extends Component {
   }
 
   componentDidMount() {
-    axios.get(`/api/user-data`).then( users => {
-      console.log('dashboard.js - received user data: ', users.data);
+    axios.get(`/api/user-data`).then( user => {
+      // console.log('dashboard.js - received user data: ', user.data);
     }).catch( err => {
       // ADD CODE HERE
       console.log('dashboard.js - api get error: ', err);

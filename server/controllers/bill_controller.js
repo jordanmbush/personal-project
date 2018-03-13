@@ -1,8 +1,7 @@
 module.exports = {
   addBills: (req, res) => {
-    console.log('bill_controller - add_bills');
-    // const { user_id } = req.session.user;
-    const user_id = 'github|34669268'; //TESTING - REMOVE!!!!!!!!!!!!!!!!!!!!!!!!!
+    const { user_id } = req.session.user;
+    // const user_id = 'github|34669268'; //TESTING - REMOVE!!!!!!!!!!!!!!!!!!!!!!!!!
 
     if(req.body.bills) {
       const db = req.app.get('db');
@@ -14,7 +13,6 @@ module.exports = {
         for(let billNum = 0; billNum < bills.length; billNum++) {
           const { name, amount, frequencyType, startDate, endDate, category, frequencyDays } = bills[billNum];
           db.add_bill(user_id, name, amount, frequencyType, startDate, endDate, category).then( bill => {
-            console.log('add_bill response: ', bill);
             // ONCE THE BILL IS ADDED, WELL RECEIVE THAT RECORD BACK WITH IT'S ID, AND WILL ADD FREQUENCY DAYS WITH THE BILL ID
             // AS TH FOREIGN KEY
             for(let day = 0; day < frequencyDays.length; day++) {
@@ -32,14 +30,12 @@ module.exports = {
   },
   //===================================================================================================================
   getBills: (req, res) => {
-    // const { user_id } = req.session.user;
-    const user_id = 'github|34669268'; //TESTING - REMOVE!!!!!!!!!!!!!!!!!!!!!!!!!
+    const { user_id } = req.session.user;
+    // const user_id = 'github|34669268'; //TESTING - REMOVE!!!!!!!!!!!!!!!!!!!!!!!!!
     const db = req.app.get('db');
     db.get_bills(user_id).then( bills => {
-      console.log('bill_controller - get_bills received: ', bills);
       res.json(bills);
     }).catch( err => {
-      console.log('bill_controller - get_bills err: ', err)
       res.status(500).send();
     });
   }

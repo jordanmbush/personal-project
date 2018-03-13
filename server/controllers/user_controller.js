@@ -12,6 +12,7 @@ module.exports = {
     }).catch( err => console.log('user_controller.js - get user err: ', err));
   },
   logout: (req, res) => {
+    console.log('logout hit');
     req.session.destroy();
     res.send(); 
   },

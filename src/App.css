@@ -2,9 +2,47 @@
   margin: 10px;
 }
 
+#root {
+  font-family: 'Varela Round', sans-serif;
+  background-image: url('./assets/add_transaction_background_img_sm.jpg');
+  background-repeat: repeat;
+  background-color: rgba(111, 214, 88, 0.623)
+}
+
+.add-transactions-component {
+  /* background-color: rgb(226, 226, 226); */
+  width: 90vw;
+  font-size: 35px;
+  padding: 5px;
+  margin: auto;
+}
+
+.header {
+  width: 100%;
+  display: flex;
+  justify-content: space-between;
+}
+
 input {
   margin: auto 2px;
-  max-height: 20px;
+  /* max-height: 20px; */
+  border: none;
+}
+
+input:disabled {
+  margin: auto 2px;
+  border: none;
+}
+
+button {
+  border: none;
+  border-radius: 5px;
+  margin: 1px;
+  font-size: 20px;
+}
+
+h1 {
+  text-align: center;
 }
 
 .days-selector input {
@@ -37,22 +75,15 @@ input {
   border-radius: 50%;
 }
 
-.transaction-table-balance::before {
-  content: "$";
-}
-
 .transaction-table-container {
-  width: 600px;
-  background-color: beige;
+  background-color: #f1f1f1b7;
+  margin: auto;
 }
 
 .month-navigation-buttons-container {
   display: flex;
   justify-content: space-between;
-  width: 600px;
-}
-.transaction-header-container {
-  
+  width: 100%;
 }
 
 .transaction-header-container > * {
@@ -62,8 +93,23 @@ input {
 .transaction-table-row-container > *{
   /* width: 90%; */
   display: flex;
-  justify-content: flex-start;
+  justify-content: space-between;
   align-items: stretch;
+  font-size: 15px;
+}
+
+.transaction-table-entry-row input {
+  border: 1px solid grey;
+  border-radius: 5px;
+  padding: 5px;
+}
+
+.banded-true {
+  background-color: #e3e3e3;
+}
+
+.banded-false {
+  background-color: #9ad3de;
 }
 
 .transaction-table-row-container:hover > * > .toggle-transactions-button-show {
@@ -111,8 +157,9 @@ input {
 .transaction-table-container > * > * > div {
   display: inline-block;
   margin: 5px 5px;
-  border: 1px solid black;
-  width: 100px;
+  /* min-width: 70px; */
+  /* border: 1px solid black; */
+  overflow: hidden;
 }
 
 .row-hidden {
@@ -128,24 +175,51 @@ input {
   /* display: none; */
 }
 
-.income-radio {
-  background-color: rgba(55, 240, 13, 0.459);
+.radio-container {
   border: none !important;
   padding: 5px;
+  border-radius: 5px;
+}
+.income-radio {
+  background-color: rgb(55, 240, 13);
 }
 
 .expense-radio {
-  background-color: rgba(215, 117, 5, 0.568);
-  border: none !important;
-  padding: 5px;
+  background-color: rgb(240, 95, 28);
 }
 
-.transaction-table-header-row {
+.transaction-table-header {
   font-weight: bold;
-  text-align: center;
-  background-color: grey;
+  display: flex;
+  justify-content: space-between;
+  /* text-align: center; */
+  background-color: #c9c9c9;
+  padding: 5px 0px;
+  border-bottom: 2px solid black;
 }
 
-.transaction-table-header-row > * {
-  border: none !important;
+.transaction-table-header > * {
+  /* border: none !important; */
+  display: inline-block;
+  width: 80px;
+  font-size: 15px;
+  text-align: left;
+}
+
+.transaction-table-header > * > * {
+  vertical-align: middle;
+}
+
+
+.transaction-table-daily-header-row {
+  font-size: 15px;
+  border-bottom: 1px solid black;
+}
+
+.transaction-table-name-column {
+  display: none !important;
+}
+
+.transaction-table-week-day-column {
+  width: 40px;
 }

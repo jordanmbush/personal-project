@@ -1,7 +1,7 @@
 module.exports = {
   getTransactionsByMonthAndYear: (req, res) => {
-    // const { user_id } = req.session.user;
-    const user_id = 'github|34669268'; //TESTING - REMOVE!!!!!!!!!!!!!!!!!!!!!!!!!
+    const { user_id } = req.session.user;
+    // const user_id = 'github|34669268'; //TESTING - REMOVE!!!!!!!!!!!!!!!!!!!!!!!!!
     const { month, year } = req.query;
 
     console.log('month: ', req.query);
@@ -14,8 +14,8 @@ module.exports = {
     })
   },
   getAllTransactions: (req, res) => {
-    // const { user_id } = req.session.user;
-    const user_id = 'github|34669268'; //TESTING - REMOVE!!!!!!!!!!!!!!!!!!!!!!!!!
+    const { user_id } = req.session.user;
+    // const user_id = 'github|34669268'; //TESTING - REMOVE!!!!!!!!!!!!!!!!!!!!!!!!!
 
     const db = req.app.get('db');
     db.get_all_transactions(user_id).then( transactions => {
@@ -26,8 +26,8 @@ module.exports = {
     })
   },
   addTransaction: (req, res) => {
-    // const { user_id } = req.session.user;
-    const user_id = 'github|34669268'; //TESTING - REMOVE!!!!!!!!!!!!!!!!!!!!!!!!!
+    const { user_id } = req.session.user;
+    // const user_id = 'github|34669268'; //TESTING - REMOVE!!!!!!!!!!!!!!!!!!!!!!!!!
     const { name, amount, date, category, type } = req.body;
     
     const db = req.app.get('db');
@@ -39,8 +39,8 @@ module.exports = {
     });
   },
   addTransactions: (req, res) => { 
-    // const { user_id } = req.session.user;
-    const user_id = 'github|34669268'; //TESTING - REMOVE!!!!!!!!!!!!!!!!!!!!!!!!!
+    const { user_id } = req.session.user;
+    // const user_id = 'github|34669268'; //TESTING - REMOVE!!!!!!!!!!!!!!!!!!!!!!!!!
     let transactions = req.body.transactionsArray;
     let addedTransactions = [];
     const db = req.app.get('db');
@@ -58,8 +58,8 @@ module.exports = {
     res.status(200).send();
   },
   deleteTransaction: (req, res) => {
-    // const { user_id } = req.session.user;
-    const user_id = 'github|34669268'; //TESTING - REMOVE!!!!!!!!!!!!!!!!!!!!!!!!!
+    const { user_id } = req.session.user;
+    // const user_id = 'github|34669268'; //TESTING - REMOVE!!!!!!!!!!!!!!!!!!!!!!!!!
     const id = req.params.id;
 
     const db = req.app.get('db');
@@ -69,5 +69,18 @@ module.exports = {
       console.log('transaction_controller.js - deleteTransaction err: ', err);
       res.status(500).send();
     });
-  }
+  },
+  updateTransaction: (req, res) => {
+    const { user_id } = req.session.user;
+    // const user_id = 'github|34669268'; //TESTING - REMOVE!!!!!!!!!!!!!!!!!!!!!!!!!
+    const { id, name, amount, date, category, type } = req.body;
+    
+    const db = req.app.get('db');
+    db.update_transaction([name, amount, date, type, category, user_id, id]).then( updatedTransaction => {
+      res.json(updatedTransaction[0]);
+    }).catch( err => {
+      console.log('transaction_controller.js - updateTransaction err: ', err);
+      res.status(500).send();
+    });
+  },
 }
