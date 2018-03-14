@@ -46,6 +46,7 @@ export default class AddTransactionsView extends Component {
     this.getWeeklyTransactionsFromTemplate = this.getWeeklyTransactionsFromTemplate.bind(this);
     this.getMonthlyTransactionsFromTemplate = this.getMonthlyTransactionsFromTemplate.bind(this);
     this.getEOWTransactionsFromTemplate = this.getEOWTransactionsFromTemplate.bind(this);
+    this.getXDAYSTransactionsFromTemplate = this.getXDAYSTransactionsFromTemplate.bind(this);
     this.getTemplateTransactions = this.getTemplateTransactions.bind(this);
     this.initializeTransactions = this.initializeTransactions.bind(this);
     this.toggleTableRowVisibility = this.toggleTableRowVisibility.bind(this);
@@ -183,6 +184,21 @@ export default class AddTransactionsView extends Component {
     }
     return transactions;
   }
+
+  getXDAYSTransactionsFromTemplate(template, dayFrom, dayThrough) {
+    let transactions = [];
+    let transactionType = template.hasOwnProperty('category') ? 'expense' : 'income';
+    let startDate = new Date(template.start_date);
+
+    for(let day = new Date(dayFrom); day <= dayThrough; day.setDate(day.getDate() + 1)) {
+      let timeDiff = Math.abs(day.getTime() - startDate.getTime());
+      let diffDays = Math.ceil(timeDiff / (1000 * 3600 * 24)); 
+      if(diffDays % template.day_num === 0 && day >= new Date(template.start_date)) {
+        transactions.push({ transactionType, name: template.name, amount: currency(template.amount).value, category: template.category, day: new Date(day) });
+      }
+    }
+    return transactions;
+  }
   // ==========================================================================================
 
   getTemplateTransactions(dayFrom, dayThrough) {
@@ -198,6 +214,9 @@ export default class AddTransactionsView extends Component {
           break;
         case EOW: templateTransactions = templateTransactions.concat(this.getEOWTransactionsFromTemplate(budgetTempate[i], dayFrom, dayThrough));
           break;
+        case XDAYS: templateTransactions = templateTransactions.concat(this.getXDAYSTransactionsFromTemplate(budgetTempate[i], dayFrom, dayThrough));
+          break;
+        default: break;
       }
     }
     return templateTransactions;
@@ -324,9 +343,9 @@ export default class AddTransactionsView extends Component {
       let dailyTotal = 0;
       let dailyTransactions = [];
       let dayID = DateFunctions.formatDate(day);
-      const expandDayButton = <button id={dayID + '-toggle-button'} className='toggle-transactions-button-show' onClick={ e => this.toggleTableRowVisibility(e) }>+</button>;
+      const expandDayButton = <button id={dayID + '-toggle-button'} className='toggle-transactions-button-show' onClick={ e => this.toggleTableRowVisibility(e.currentTarget) }>+</button>;
       const subTransactionHeader = (
-        <div className='row-hidden transaction-table-row-header'>
+        <div className='transaction-table-row-header'>
           <div className='sub-transaction-header-title'>Balance</div>
           <div className='sub-transaction-header-title'>Name</div>
           <div className='sub-transaction-header-title'>Amount</div>
@@ -347,43 +366,56 @@ export default class AddTransactionsView extends Component {
         const editTransactionButton = <button data-is-transaction={id || false} data-index={formattedTransactionKey} id={`${currentMonthTransactionKey}-edit-button`} onClick={(e) => this.toggleEditSaveTransactionButton(e.currentTarget)}>Edit</button>
 
         dailyTransactions.push(
-          <div className='row-hidden transaction-table-row' id={`${dayID}-${i}`}>
-            <input disabled id={`${currentMonthTransactionKey}-balance`} className='transaction-balance' onChange={e => this.updateTransactionValues(e)} value={currency(this.state.currentMonthTransactions[currentMonthTransactionKey].balance).format(true)}></input>
-            <input disabled id={`${currentMonthTransactionKey}-name`} className='transaction-name' onChange={e => this.updateTransactionValues(e)} value={this.state.currentMonthTransactions[currentMonthTransactionKey].name}></input>
-            <input disabled id={`${currentMonthTransactionKey}-amount`} className='transaction-amount' onChange={e => this.updateTransactionValues(e)} value={currency(this.state.currentMonthTransactions[currentMonthTransactionKey].amount).value} type='number'></input>
-            <input disabled id={`${currentMonthTransactionKey}-category`} className='transaction-category' onChange={e => this.updateTransactionValues(e)} value={this.state.currentMonthTransactions[currentMonthTransactionKey].category}></input>
-            <div className='income-radio radio-container'>
-              <label htmlFor={currentMonthTransactionKey + '-radio-income'}>Income</label>
-              <input disabled id={`${currentMonthTransactionKey}-radio-income`}  type='radio' name={`${currentMonthTransactionKey}-transaction-type`} onChange={(e) => this.updateTransactionValues(e)} checked={this.state.currentMonthTransactions[currentMonthTransactionKey].transactionType === 'income'}></input>
+          <div className='transaction-table-row' id={`${dayID}-${i}`}>
+            <div className='transaction-info'>
+                <input disabled id={`${currentMonthTransactionKey}-balance`} className='transaction-balance' onChange={e => this.updateTransactionValues(e)} value={currency(this.state.currentMonthTransactions[currentMonthTransactionKey].balance).format(true)}></input>
+                <input disabled id={`${currentMonthTransactionKey}-name`} className='transaction-name' onChange={e => this.updateTransactionValues(e)} value={this.state.currentMonthTransactions[currentMonthTransactionKey].name}></input>
+                <input disabled id={`${currentMonthTransactionKey}-amount`} className='transaction-amount' onChange={e => this.updateTransactionValues(e)} value={currency(this.state.currentMonthTransactions[currentMonthTransactionKey].amount).value} type='number'></input>
+                <input disabled id={`${currentMonthTransactionKey}-category`} className='transaction-category' onChange={e => this.updateTransactionValues(e)} value={this.state.currentMonthTransactions[currentMonthTransactionKey].category}></input>
             </div>
-            <div className='expense-radio radio-container'>
-              <label htmlFor={`${currentMonthTransactionKey}-radio-expense`}>Expense</label>
-              <input disabled id={currentMonthTransactionKey + '-radio-expense'} type='radio' name={`${currentMonthTransactionKey}-transaction-type`} onChange={(e) => this.updateTransactionValues(e)} checked={this.state.currentMonthTransactions[currentMonthTransactionKey].transactionType === 'expense'}></input>
+            <div className='transaction-buttons-container'>
+              <div className='income-radio radio-container'>
+                <label htmlFor={currentMonthTransactionKey + '-radio-income'}><i class="far fa-money-bill-alt"></i></label>
+                <input disabled id={`${currentMonthTransactionKey}-radio-income`}  type='radio' name={`${currentMonthTransactionKey}-transaction-type`} onChange={(e) => this.updateTransactionValues(e)} checked={this.state.currentMonthTransactions[currentMonthTransactionKey].transactionType === 'income'}></input>
+              </div>
+              <div className='expense-radio radio-container'>
+                <label htmlFor={`${currentMonthTransactionKey}-radio-expense`}>Expense</label>
+                <input disabled id={currentMonthTransactionKey + '-radio-expense'} type='radio' name={`${currentMonthTransactionKey}-transaction-type`} onChange={(e) => this.updateTransactionValues(e)} checked={this.state.currentMonthTransactions[currentMonthTransactionKey].transactionType === 'expense'}></input>
+              </div>
+              {editTransactionButton}
+              {deleteTransactionButton}
             </div>
-            {editTransactionButton}
-            {deleteTransactionButton}
           </div>
         );
       }
       // ============================================================================
-      let weekClass = 'banded-false';
+      let bandedWeekClass = 'banded-false';
       let tempDay = new Date(day);
       if(tempDay.getDay() === 0 && !bandStartDate) {
         bandStartDate = new Date(tempDay);
-        weekClass = 'banded-true';
+        bandedWeekClass = 'banded-true';
       }
       if(bandStartDate) {
         if(Math.floor((tempDay.getDate() - bandStartDate.getDate())/7) % 2 === 0) {
-          weekClass = 'banded-true';
+          bandedWeekClass = 'banded-true';
         } else {
-          weekClass = 'banded-false';
+          bandedWeekClass = 'banded-false';
         }
       }
+      if(day.isSameDateAs(new Date())) {
+        bandedWeekClass += ' transaction-row-today'
+      }
+
+      let dayBalanceStyle = {
+      }
+
+      balance < 0 ? dayBalanceStyle.color = 'red' : '';
+      
       let dailySummaryRow = (
-        <div className={`transaction-table-daily-header-row ${weekClass}`} id={`${dayID}-header-row`}>
-          <div className='transaction-table-week-day-column'>{day.toString().split(' ')[0]}</div>
-          <div className='transaction-table-balance-column'>{currency(balance).format(true)}</div>
+        <div className={`transaction-table-daily-header-row ${bandedWeekClass}`} id={`${dayID}-header-row`} onClick={e => this.toggleTableRowVisibility(e.currentTarget)}>
           <div className='transaction-table-date-column'>{DateFunctions.simpleDateFormat(day)}</div>
+          <div className='transaction-table-week-day-column'>{day.toString().split(' ')[0]}</div>
+          <div style={dayBalanceStyle} className='transaction-table-balance-column'>{currency(balance).format(true)}</div>
           <div className='transaction-table-name-column'>{billsForDay.length > 1 && 'Multiple Transactions...' || billName}</div>
           <div className='transaction-table-amount-column'>{currency(dailyTotal).format(true)}</div>
           {expandDayButton}
@@ -395,21 +427,23 @@ export default class AddTransactionsView extends Component {
       transactionTable.push(
         <div className='transaction-table-row-container' id={dayID}>
           {dailySummaryRow}
-          {subTransactionHeader}
-          {dailyTransactions}
-          <div className='transaction-table-entry-row row-hidden' id={dayID + '-entry-row'}>
-            <input id={dayID + '-entry-name'}      placeholder="name - e.g. 'Water'"></input>
-            <input id={dayID + '-entry-amount'}    placeholder='amount' type='number'></input>
-            <input id={dayID + '-entry-category'}  placeholder='category'></input>
-            <div className='income-radio radio-container'>
-              <label htmlFor={dayID + '-radio-income'}>Income</label>
-              <input id={dayID + '-radio-income'}  type='radio' name={`${dayID}-transaction-type`}></input>
+          <div className='transaction-row-content-container row-hidden' id={`${dayID}-content-container`}>
+            {subTransactionHeader}
+            {dailyTransactions}
+            <div className='transaction-table-entry-row' id={dayID + '-entry-row'}>
+              <input id={dayID + '-entry-name'}      placeholder="name - e.g. 'Water'"></input>
+              <input id={dayID + '-entry-amount'}    placeholder='amount' type='number'></input>
+              <input id={dayID + '-entry-category'}  placeholder='category'></input>
+              <div className='income-radio radio-container'>
+                <label htmlFor={dayID + '-radio-income'}>Income</label>
+                <input id={dayID + '-radio-income'}  type='radio' name={`${dayID}-transaction-type`}></input>
+              </div>
+              <div className='expense-radio radio-container'>
+                <label htmlFor={dayID + '-radio-expense'}>Expense</label>
+                <input id={dayID + '-radio-expense'} type='radio' name={`${dayID}-transaction-type`} checked></input>
+              </div>
+              <button id={dayID + '-add-button'} onClick={e => this.addTransaction(e)} >Add</button>
             </div>
-            <div className='expense-radio radio-container'>
-              <label htmlFor={dayID + '-radio-expense'}>Expense</label>
-              <input id={dayID + '-radio-expense'} type='radio' name={`${dayID}-transaction-type`} checked></input>
-            </div>
-            <button id={dayID + '-add-button'} onClick={e => this.addTransaction(e)} >Add</button>
           </div>
         </div>
       )
@@ -607,27 +641,27 @@ export default class AddTransactionsView extends Component {
     }).catch( err => console.log('addTransactionView.js addTransaction err: ', err));
   }
   
-  toggleTableRowVisibility(e) {
-    // NEED TO SET CLASSNAME BASED ON BUTTON'S CLASS OR VALUE - HAVING ISSUES WHEN ADD TRANSACTIONS
-    // ADDED TRANSACTIONS CLASS IS SET TO HIDE - BUT SHOW/HIDE BUTTON IS SET TO HIDE ON THE NEXT CLICK,
-    // WHICH CHANGES THE NEW TRANSACTION TO SHOW, BUT THE ENTRY ROW TO HIDE.
-    let id = e.target.id.replace('-toggle-button', '');
-    let children = document.getElementById(id).childNodes;
-    let buttonClassList = document.getElementById(e.target.id).className.split(' ');
+  toggleTableRowVisibility(target) {
+    let id = target.id.replace('-toggle-button', '');
+    id = id.replace('-header-row', '');
+    let toggleButton = document.getElementById(id + '-toggle-button');
+    let contentContainer = document.getElementById(id + '-content-container');
+    
+    // 'transaction-row-content-container'
+    let contentContainerClassList = contentContainer.className.split(' ');
+    let buttonClassList = toggleButton.className.split(' ');
 
-    for(let i = 1; i < children.length; i++) {
-      let classList = children[i].className.split(' ');
-      if(buttonClassList.indexOf('toggle-transactions-button-hide') !== -1) {
-        classList.splice(classList.indexOf('row-showing'), 1, 'row-hidden');
-        children[i].className = classList.join(' ');
-        document.getElementById(e.target.id).className = 'toggle-transactions-button-show';
-        document.getElementById(e.target.id).innerText = '+';
-      } else if(buttonClassList.indexOf('toggle-transactions-button-show') !== -1) {
-        classList.splice(classList.indexOf('row-hidden'), 1, 'row-showing');
-        children[i].className = classList.join(' ');
-        document.getElementById(e.target.id).className = 'toggle-transactions-button-hide';
-        document.getElementById(e.target.id).innerText = '-';
-      }
+
+    if(buttonClassList.indexOf('toggle-transactions-button-hide') !== -1) {
+      contentContainerClassList.splice(contentContainerClassList.indexOf('row-showing'), 1, 'row-hidden');
+      contentContainer.className = contentContainerClassList.join(' ');
+      toggleButton.className = 'toggle-transactions-button-show';
+      toggleButton.innerText = '+';
+    } else if(buttonClassList.indexOf('toggle-transactions-button-show') !== -1) {
+      contentContainerClassList.splice(contentContainerClassList.indexOf('row-hidden'), 1, 'row-showing');
+      contentContainer.className = contentContainerClassList.join(' ');
+      toggleButton.className = 'toggle-transactions-button-hide';
+      toggleButton.innerText = '-';
     }
   }
   
@@ -639,28 +673,28 @@ export default class AddTransactionsView extends Component {
     return (
       <div className='add-transactions-component'>
         <Header />
-        <h1>{monthYearHeader}</h1>
+        <div className='add-transactions-header'><h1>{monthYearHeader}</h1></div>
         <div className='month-navigation-buttons-container top-buttons'>
-          <button onClick={this.previousMonth}>Previous Month</button>
+          <button onClick={this.previousMonth}><i className="fas fa-chevron-circle-left"></i><span>Previous Month</span></button>
           <button onClick={this.currentMonth}>Current Month</button>
-          <button onClick={this.nextMonth}>Next Month</button>
+          <button onClick={this.nextMonth}><i className="fas fa-chevron-circle-right"></i><span>Next Month</span></button>
         </div>
         <div className='transaction-table-container'>
           <div className='transaction-table-header-container'>
             <div className='transaction-table-header'>
-              <div className='transaction-table-week-day-column' >Week Day</div>
-              <div className='transaction-table-balance-column' >Balance</div>
-              <div className='transaction-table-date-column' >Date</div>
-              <div className='transaction-table-name-column' >Name</div>
-              <div className='transaction-table-amount-column' >Amount</div>
+              <div className='transaction-table-week-day-column'><span>Day</span></div>
+              <div className='transaction-table-balance-column'><span>Balance</span></div>
+              <div className='transaction-table-date-column'><span>Date</span></div>
+              <div className='transaction-table-name-column'><span>Name</span></div>
+              <div className='transaction-table-amount-column'><span>Amount</span></div>
             </div>
           </div>
           {transactions}
         </div>
         <div className='month-navigation-buttons-container bottom-buttons'>
-          <button onClick={this.previousMonth}>Previous Month</button>
+          <button onClick={this.previousMonth}><i className="fas fa-chevron-circle-left"></i><span>Previous Month</span></button>
           <button onClick={this.currentMonth}>Current Month</button>
-          <button onClick={this.nextMonth}>Next Month</button>
+          <button onClick={this.nextMonth}><i className="fas fa-chevron-circle-right"></i><span>Next Month</span></button>
         </div>
       </div>
     )

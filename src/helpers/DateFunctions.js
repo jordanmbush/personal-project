@@ -18,7 +18,7 @@ module.exports =  {
     let day = '' + (date.getDate());
     let year = date.getFullYear();
 
-    return `${month}/${day.toString() }/${year.toString().substring(2)}`;
+    return `${month}/${'0'.repeat(2 - day.toString().length) + day.toString() }/${year.toString().substring(2)}`;
   },
 
   getMonthNum: (date) => {

@@ -31,8 +31,32 @@ export default class Login extends Component {
 
   render() {
     return (
-      <div className='login'>
-        <button onClick={this.login}>Login / Register</button>
+      <div className='login-component'>
+        <h1>Monilibrium</h1>
+        <div className='login-button-container'>
+          <div className='login-into'><p>Let's do this! Not a member? Psst. No problem. Login with one of many major online platforms.</p></div>
+          <button onClick={this.login}>Login / Register</button>
+        </div>
+        <div id='panel-1' className='panel'>
+          <h2>50% of Americans have less than one month's income saved!</h2>
+          <div className='panel-content'>
+            <img src='http://ak3.picdn.net/shutterstock/videos/9802973/thumb/1.jpg' alt='Savings Jar with a few coins'></img>
+            <p>Top personal finance advisors will tell you - and especially drawing from lessons in the economic crisis to have at least six months income saved, just in case.</p>
+          </div>
+          <aside><a href='http://www.businessinsider.com/a-dozen-shocking-personal-finance-statistics-2011-5'>www.businessinsider.com</a></aside>
+        </div>
+        <div id='panel-2' className='panel'>
+          <div>
+          </div>
+        </div>
+        <div id='panel-3' className='panel'>
+          <div>
+          </div>
+        </div>
+        <div id='panel-4' className='panel'>
+          <div>
+          </div>
+        </div>
       </div>
     )
   }

@@ -1,12 +1,16 @@
-.bills-entry-container > * {
-  margin: 10px;
-}
-
 #root {
   font-family: 'Varela Round', sans-serif;
   background-image: url('./assets/add_transaction_background_img_sm.jpg');
   background-repeat: repeat;
-  background-color: rgba(111, 214, 88, 0.623)
+  background-color: rgba(111, 214, 88, 0.623);
+  border-collapse: inherit;
+  box-sizing: border-box;
+  border-top: solid .1px white;
+}
+
+.login-component {
+  width: 100vw;
+  height: 100vh;
 }
 
 .add-transactions-component {
@@ -23,10 +27,26 @@
   justify-content: space-between;
 }
 
-input {
-  margin: auto 2px;
-  /* max-height: 20px; */
-  border: none;
+.header div h1 {
+  font-family: 'Lobster', cursive;
+  font-size: 40px;
+}
+
+.header button {
+  font-size: 15px;
+  background-color: #07889B;
+  margin: 5px;
+}
+
+.logout-button > * {
+  color: white;
+  font-size: 20px;
+  font-weight: bold;
+}
+
+.dashboard-button {
+  color: white;
+  font-weight: bold;
 }
 
 input:disabled {
@@ -36,48 +56,112 @@ input:disabled {
 
 button {
   border: none;
-  border-radius: 5px;
   margin: 1px;
   font-size: 20px;
 }
-
-h1 {
-  text-align: center;
-}
-
-.days-selector input {
-  display: none!important;
-}
-
-.days-selector input[type=checkbox] + label {
-  display: inline-block;
-  /* border-radius: 50%; */
-  background: #dddddd;
-  height: 40px;
-  width: 40px;
-  margin-right: 3px;
-  line-height: 40px;
-  text-align: center;
+button:hover {
   cursor: pointer;
 }
+/* 
+=================================================================
+====================== LOGIN COMPONENT ==========================
+=================================================================
+ */
 
-.days-selector input[type=checkbox]:checked + label {
-  background: #2AD705;
-  color: #ffffff;
+.login-component h1 {
+  font-family: 'Lobster', cursive;
+  font-size: 40px;
+  padding: 10px;
+  position: fixed;
+  top: 0px;
+  width: 100vw;
+  background-color: rgb(110, 170, 97);
+  z-index: 1;
+}
+ 
+.login-button-container {
+  display: flex;
+  flex-direction: column;
+  height: 130px;
+  text-align: center;
+  background-color: #CAEBF2;
+  border-radius: 10px;
+  width: 200px;
+  padding-top: 10px;
+  margin: 100px auto 80px auto;
+  position: relative;
+  box-shadow: 5px 7px 15px 0px rgba(0,0,0,0.25);
+  transform: scale(1.25);
 }
 
-.month-days-selector input[type=checkbox] + label {
-  border-radius: 20%;
-  margin-top: 6px;
+.login-button-container button {
+  border-bottom-left-radius: 10px;
+  border-bottom-right-radius: 10px;
+  height: 40px;
+  margin: 0;
+  position: absolute;
+  width: 100%;
+  background-color: #07889B;
+  color: white;
+  bottom: 0;
 }
 
-.week-days-selector input[type=checkbox] + label {
-  border-radius: 50%;
+.login-button-container button:hover {
+  cursor: pointer;
+  background-color: rgba(7, 135, 155, 0.74);
+}
+.panel {
+  height: 200px;
 }
 
-.transaction-table-container {
-  background-color: #f1f1f1b7;
+.panel {
+  display: flex;
+  flex-flow: column;
   margin: auto;
+}
+
+.panel h2 {
+  font-size: 30px;
+  font-family: 'Times New Roman', Times, serif;
+}
+
+.panel > div {
+  display: flex;
+  width: 70%;
+  margin: auto;
+  color: white;
+}
+
+#panel-1 {
+  background-color: #07889B;
+}
+#panel-2 {
+  background-color: rgba(202, 235, 242, 0.671);
+}
+#panel-3 {
+  background-color: rgb(110, 180, 97);
+}
+#panel-4 {
+  background-color: rgba(7, 135, 155, 0.562);
+}
+
+.panel img {
+  height: 100px;
+  box-shadow: 
+}
+
+/* 
+=================================================================
+============== ADD TRANSACTIONS VIEW COMPONENT ==================
+=================================================================
+ */
+.transaction-table-container {
+  margin: auto;
+}
+
+.add-transactions-header h1 {
+  text-align: center;
+  font-family: 'Lucida Sans', 'Lucida Sans Regular', 'Lucida Grande', 'Lucida Sans Unicode', Geneva, Verdana, sans-serif;
 }
 
 .month-navigation-buttons-container {
@@ -86,15 +170,112 @@ h1 {
   width: 100%;
 }
 
-.transaction-header-container > * {
-  display: inline-block;
+.month-navigation-buttons-container button {
+  color: rgb(73, 73, 73);
+  font-weight: bold;
+  font-size: 25px;
+  background-color: #CAEBF2;
 }
 
-.transaction-table-row-container > *{
-  /* width: 90%; */
+.month-navigation-buttons-container span {
+  display: none;
+}
+
+.transaction-table-header {
   display: flex;
   justify-content: space-between;
+  font-size: 15px;
+  font-weight: bold;
+  background-color: #c9c9c9;
+  padding: 5px 0px;
+  border-bottom: 2px solid black;
+}
+
+.transaction-table-header > div > * {
+  margin: auto 0;
+}
+
+.transaction-table-row-container {
+  display: flex;
+  flex-direction: column;
+}
+
+.transaction-table-daily-header-row {
+  display: flex;
+  flex-direction: row;
+  justify-content: space-between;
   align-items: stretch;
+  font-size: 15px;
+  font-weight: bold;
+  margin: 2.5px 5px;
+  padding: 5px;
+}
+
+.transaction-row-content-container {
+  display: flex;
+  flex-direction: column;
+  width: 90%;
+  background-color: #CAEBF2;
+  padding: 10px;
+  margin: auto;
+  border-top-right-radius: 15px;
+  border: 1px solid #07889B;
+  box-shadow: 8px 4px 5px rgba(128, 128, 128, 0.541);
+}
+
+.transaction-table-row {
+  display: flex;
+  flex-direction: column;
+}
+
+.transaction-table-row > * {
+  display: flex;
+  justify-content: space-between;
+}
+
+.transaction-table-row > * > * {
+  flex: 1;
+  text-align: center;
+  margin: 5px;
+}
+
+.transaction-info > * {
+  width: 75px;
+  padding: 2.5px;
+  font-weight: bold;
+}
+
+.transaction-buttons-container {
+  height: 40px;
+}
+
+.transaction-buttons-container > * {
+  font-size: 15px;
+}
+
+.fa-money-bill-alt {
+  font-size: 25px;
+}
+
+.transaction-table-row-header {
+  display: flex;
+  font-size: 15px;
+  justify-content: space-between;
+  width: 95%;
+  padding: 5px;
+  font-weight: bold;
+  text-decoration-line: underline;
+  background-color: rgb(175, 229, 241);
+  border-radius: 5px;
+  border: 2px solid #07889B;
+}
+
+.transaction-table-entry-row {
+  display: flex;
+}
+
+.transaction-table-entry-row > * {
+  width: 50px;
   font-size: 15px;
 }
 
@@ -105,15 +286,11 @@ h1 {
 }
 
 .banded-true {
-  background-color: #e3e3e3;
+  background-color: rgb(184, 184, 184);
 }
 
 .banded-false {
-  background-color: #9ad3de;
-}
-
-.transaction-table-row-container:hover > * > .toggle-transactions-button-show {
-  display: inline-block;
+  background-color: #EFEFEF;
 }
 
 .toggle-transactions-button-show {
@@ -149,67 +326,32 @@ h1 {
   margin-bottom: auto;
 }
 
-.toggle-transactions-button-show:hover {
-  display: inline-block;
-  cursor: pointer;
-}
-
-.transaction-table-container > * > * > div {
-  display: inline-block;
+/* .transaction-table-container > * > * > div {
   margin: 5px 5px;
-  /* min-width: 70px; */
-  /* border: 1px solid black; */
-  overflow: hidden;
-}
+} */
 
 .row-hidden {
   display: none;
 }
 
-.row-showing {
-  width: 80%;
-  margin-left: 20px;
-}
-
-.transaction-table-entry-row {
-  /* display: none; */
+.transaction-row-today {
+  background-color: #07889B;
+  color: white;
 }
 
 .radio-container {
-  border: none !important;
   padding: 5px;
   border-radius: 5px;
 }
 .income-radio {
-  background-color: rgb(55, 240, 13);
+  background-color: rgb(140, 214, 124);
+  font-size: 15px;
 }
 
 .expense-radio {
-  background-color: rgb(240, 95, 28);
-}
-
-.transaction-table-header {
-  font-weight: bold;
-  display: flex;
-  justify-content: space-between;
-  /* text-align: center; */
-  background-color: #c9c9c9;
-  padding: 5px 0px;
-  border-bottom: 2px solid black;
-}
-
-.transaction-table-header > * {
-  /* border: none !important; */
-  display: inline-block;
-  width: 80px;
+  background-color: #FF3B3F;
   font-size: 15px;
-  text-align: left;
 }
-
-.transaction-table-header > * > * {
-  vertical-align: middle;
-}
-
 
 .transaction-table-daily-header-row {
   font-size: 15px;
@@ -217,9 +359,206 @@ h1 {
 }
 
 .transaction-table-name-column {
-  display: none !important;
+  display: none;
+  width: 80px;
 }
 
 .transaction-table-week-day-column {
   width: 40px;
+}
+
+.transaction-table-amount-column {
+  width: 90px;
+  text-align: right;
+}
+
+.transaction-table-date-column {
+  text-align: center;
+}
+
+.transaction-table-balance-column {
+  text-align: center;
+}
+
+/* 
+=================================================================
+====================== CREATE BUDGET COMPONENT ==================
+=================================================================
+ */
+
+small {
+  font-size: 5px;
+  font-style: italic;
+}
+
+.create-budget-component {
+  width: 100vw;
+}
+
+.create-budget-component h1 {
+  font-family: 'Lucida Sans', 'Lucida Sans Regular', 'Lucida Grande', 'Lucida Sans Unicode', Geneva, Verdana, sans-serif;
+  font-size: 30px;
+  text-align: center;
+}
+
+.create-budget-component h2 {
+  font-size: 20px;
+  font-weight: bold;
+  text-align: center;
+}
+
+.entry-container {
+  width: 90%;
+  margin: auto;
+  background-color: rgba(202, 235, 242, 0.842);
+  border: solid 5px #07889B;
+  border-top-right-radius: 20px;
+  box-shadow: 8px 4px 5px rgba(128, 128, 128, 0.548);
+}
+
+.entry-container select {
+  font-size: 15px;
+  font-weight: bold; 
+  width: 100px;
+}
+
+.entry-container > * {
+  margin: 5px;
+  display: flex;
+  flex-direction: column;
+  flex-wrap: wrap;
+  width: 80%;
+  margin: 10px auto;
+}
+
+.week-days-selector {
+  margin-left: 30px;
+}
+
+.summary-management-container {
+  display: flex;
+  flex-direction: row;
+}
+
+.summary-management-container > * {
+  display: flex;
+  flex-direction: column;
+  margin: 5px;
+}
+
+.budget-buttons-container {
+  flex: 1;
+}
+
+.budget-buttons-container > * {
+  font-size: 15px;
+  font-weight: bold;
+  background-color: #07889B;
+  color: white;
+  box-shadow: 4px 4px 5px rgba(128, 128, 128, 0.637);
+  margin: 3px;
+  border: 1px solid white;
+  padding: 2px;
+}
+
+.budget-buttons-container button:hover {
+  font-size: 16px;
+}
+
+.list-container {
+  flex: 2;
+}
+
+.budget-list {
+  width: 100% !important;
+}
+
+.days-selector {
+  display: inline-block;
+}
+
+.entry-container input {
+  border-radius: 5px;
+  border: 1px solid grey;
+  padding: 5px;
+}
+
+.entry-container select {
+  border-radius: 5px;
+  border: 1px solid grey;
+  padding: 5px;
+}
+
+hr {
+  width: 85%;
+  height: 4px;
+}
+ 
+.days-selector input {
+  display: none!important;
+}
+
+.days-selector input[type=checkbox] + label {
+  display: inline-block;
+  /* border-radius: 50%; */
+  background: #dddddd;
+  height: 40px;
+  width: 40px;
+  margin-right: 3px;
+  line-height: 40px;
+  text-align: center;
+  cursor: pointer;
+}
+
+.days-selector input[type=checkbox]:checked + label {
+  background: #2AD705;
+  color: #ffffff;
+}
+
+.month-days-selector input[type=checkbox] + label {
+  border-radius: 20%;
+  margin-top: 6px;
+}
+
+.week-days-selector input[type=checkbox] + label {
+  border-radius: 50%;
+}
+
+
+@media (min-width: 650px) {
+  .add-transactions-component {
+    /* background-color: rgb(226, 226, 226); */
+    width: 70vw;
+    font-size: 35px;
+    padding: 5px;
+    margin: auto;
+  } 
+  .month-navigation-buttons-container button {
+    min-width: 100px;
+  }
+  .entry-container {
+    width: 70%;
+  }
+}
+
+@media (min-width: 1000px) {
+  .add-transactions-component {
+    /* background-color: rgb(226, 226, 226); */
+    width: 55vw;
+    font-size: 35px;
+    padding: 5px;
+    margin: auto;
+  } 
+  .transaction-table-name-column {
+    display: inherit;
+  }
+  .month-navigation-buttons-container button {
+    font-size: 20px;
+  }
+  .month-navigation-buttons-container span {
+    display: inherit;
+  }
+  .entry-container {
+    width: 50%;
+  }
 }
