@@ -1,7 +1,6 @@
 module.exports = {
   getUser: (req, res) => {
     const { user_id } = req.session.user;
-    console.log('session: ', req.session.user);
     const db = req.app.get('db');
     db.get_user_by_user_id(user_id).then( users => {
       if(users.length) {

@@ -1,17 +1,40 @@
+hr {
+  width: 85%;
+  height: 4px;
+}
+
+button {
+  border: none;
+  margin: 1px;
+  font-size: 20px;
+}
+button:hover {
+  cursor: pointer;
+}
+input:disabled {
+  margin: auto 2px;
+  border: none;
+}
+small {
+  font-size: 5px;
+  font-style: italic;
+}
 #root {
   font-family: 'Varela Round', sans-serif;
   background-image: url('./assets/add_transaction_background_img_sm.jpg');
   background-repeat: repeat;
-  background-color: rgba(111, 214, 88, 0.623);
+  background-position: center;
+  background-attachment: fixed;
+  background-color: whitesmoke;
   border-collapse: inherit;
   box-sizing: border-box;
   border-top: solid .1px white;
 }
-
-.login-component {
-  width: 100vw;
-  height: 100vh;
-}
+/* 
+=================================================================
+======================== HEADER COMPONENT =======================
+=================================================================
+ */
 
 .add-transactions-component {
   /* background-color: rgb(226, 226, 226); */
@@ -23,51 +46,52 @@
 
 .header {
   width: 100%;
-  display: flex;
-  justify-content: space-between;
+}
+
+.header > * {
+  display: inline-block;
 }
 
 .header div h1 {
   font-family: 'Lobster', cursive;
   font-size: 40px;
+  letter-spacing: 5px;
+  font-weight: bold;
+  color: #2AD705;
+  text-shadow: 4px 4px #0973B3;
 }
-
+.header div {
+  margin-left: 20px;
+}
 .header button {
   font-size: 15px;
-  background-color: #07889B;
+  background-color: #0973B3;
   margin: 5px;
 }
-
 .logout-button > * {
   color: white;
-  font-size: 20px;
+  font-size: 33px;
   font-weight: bold;
 }
-
+.logout-button {
+  float: right;
+}
 .dashboard-button {
   color: white;
   font-weight: bold;
+  font-size: 30px !important;
 }
 
-input:disabled {
-  margin: auto 2px;
-  border: none;
-}
-
-button {
-  border: none;
-  margin: 1px;
-  font-size: 20px;
-}
-button:hover {
-  cursor: pointer;
-}
 /* 
 =================================================================
 ====================== LOGIN COMPONENT ==========================
 =================================================================
  */
 
+.login-component {
+  width: 100vw;
+}
+ 
 .login-component h1 {
   font-family: 'Lobster', cursive;
   font-size: 40px;
@@ -75,79 +99,158 @@ button:hover {
   position: fixed;
   top: 0px;
   width: 100vw;
-  background-color: rgb(110, 170, 97);
-  z-index: 1;
+  background-color: #5AE500;
+  z-index: 2;
 }
- 
+
+.hero-panel {
+  height: 100vh;
+}
+
+.welcome-container {
+  position: relative;
+  top: 18vh;
+}
+
+.welcome-container h2 {
+  text-align: center;
+  font-size: 50px;
+  font-family: 'Lobster', cursive;
+}
+
+.color-strip-container {
+  display: flex;
+  height: 5px;
+  margin-bottom: 5px;
+}
+.color-strip-container > * {
+  flex: 1;
+}
+.color-strip-container > :nth-child(1) {
+  background-color: #0973B3;
+  border-top-left-radius: 5px;
+}
+.color-strip-container > :nth-child(2) {
+  background-color: #2AD705;
+}
+.color-strip-container > :nth-child(3) {
+  background-color: #FFF400;
+}
+.color-strip-container > :nth-child(4) {
+  background-color: #0DA5FF;
+  border-top-right-radius: 5px;
+}
 .login-button-container {
   display: flex;
   flex-direction: column;
-  height: 130px;
+  height: 160px;
   text-align: center;
-  background-color: #CAEBF2;
-  border-radius: 10px;
+  background-color: rgba(128, 128, 128, 0.322);
+  border-radius: 5px;
   width: 200px;
-  padding-top: 10px;
-  margin: 100px auto 80px auto;
-  position: relative;
+  position: absolute;
+  top: 30vh;
+  left: 50%;
+  margin-left: -100px;
   box-shadow: 5px 7px 15px 0px rgba(0,0,0,0.25);
-  transform: scale(1.25);
+  transform: scale(1.30);
+  z-index: 1;
 }
 
 .login-button-container button {
-  border-bottom-left-radius: 10px;
-  border-bottom-right-radius: 10px;
   height: 40px;
-  margin: 0;
-  position: absolute;
-  width: 100%;
-  background-color: #07889B;
+  width: 70%;
+  margin: 20px auto 0 auto;
+  background-color: #0973B3;
   color: white;
-  bottom: 0;
+  font-size: 10px;
+  font-weight: bold;
+  border-radius: 40px;
 }
-
 .login-button-container button:hover {
   cursor: pointer;
-  background-color: rgba(7, 135, 155, 0.74);
+  background-color: rgb(47, 138, 190);
 }
-.panel {
+
+.login-button-container .login-container-message {
+  color: #0973B3;
+  font-weight: bold;
+  text-align: left;
+  margin: 10px 0 0 10px;
+}
+.login-blur-box {
   height: 200px;
+  border-radius: 2px;
+  width: 250px;
+  position: absolute;
+  top: 29vh;
+  left: 50%;
+  margin-left: -125px;
+  filter: blur(3px);
+  background-image: url('./assets/add_transaction_background_img_sm.jpg');
+  background-repeat: repeat;
+  background-position: center;
+  background-attachment: fixed;
+}
+
+.panel {
+  min-height: 100vh;
 }
 
 .panel {
   display: flex;
-  flex-flow: column;
-  margin: auto;
+  align-items: center;
 }
 
-.panel h2 {
-  font-size: 30px;
-  font-family: 'Times New Roman', Times, serif;
-}
-
-.panel > div {
+.panel-content {
   display: flex;
-  width: 70%;
-  margin: auto;
+  flex-direction: column;
+  margin: 10px;
+}
+
+.panel-content h2 {
+  font-size: 30px;
+}
+.panel-content h3 {
+  font-size: 15px;
+  font-weight: bold;
+}
+.panel-content li {
+  margin: 5px;
+}
+.panel-content aside {
+  font-size: 10px;
+  font-style: italic;
+}
+.panel-main-info {
+  display: flex;
+  flex-wrap: wrap;
+  width: 90%;
+}
+
+.panel-main-info > * {
+  margin: 10px 10px 10px 0;
+}
+.panel-content{
+  margin-left: 20px;
+}
+ 
+#panel-1 {
+  background-color: rgba(13, 166, 255, 0.8);
   color: white;
 }
-
-#panel-1 {
-  background-color: #07889B;
-}
 #panel-2 {
-  background-color: rgba(202, 235, 242, 0.671);
+  background-color: rgba(102, 255, 0, 0.8);
 }
 #panel-3 {
-  background-color: rgb(110, 180, 97);
+  background-color: rgba(255, 242, 0, 0.8);
 }
 #panel-4 {
-  background-color: rgba(7, 135, 155, 0.562);
+  background-color: rgba(13, 166, 255, 0.8);
 }
 
 .panel img {
-  height: 100px;
-  box-shadow: 
+  height: 150px;
 }
 
 /* 
@@ -171,10 +274,12 @@ button:hover {
 }
 
 .month-navigation-buttons-container button {
-  color: rgb(73, 73, 73);
+  color: white;
   font-weight: bold;
-  font-size: 25px;
-  background-color: #CAEBF2;
+  font-size: 20px;
+  padding: 5px;
+  background-color: #0973B3;
+  border-radius: 10px;
 }
 
 .month-navigation-buttons-container span {
@@ -184,11 +289,15 @@ button:hover {
 .transaction-table-header {
   display: flex;
   justify-content: space-between;
-  font-size: 15px;
+  font-size: 20px;
+  color: #0973B3;
   font-weight: bold;
-  background-color: #c9c9c9;
-  padding: 5px 0px;
-  border-bottom: 2px solid black;
+  background-color: white;
+  padding: 5px 5px;
+  border: 2px solid black;
+  border-radius: 5px;
+  text-decoration-line: underline;
+
 }
 
 .transaction-table-header > div > * {
@@ -198,6 +307,8 @@ button:hover {
 .transaction-table-row-container {
   display: flex;
   flex-direction: column;
+  background-color: rgba(128, 128, 128, 0.322);
+  box-shadow: 5px 10px 2px rgba(128, 128, 128, 0.685);
 }
 
 .transaction-table-daily-header-row {
@@ -207,19 +318,22 @@ button:hover {
   align-items: stretch;
   font-size: 15px;
   font-weight: bold;
-  margin: 2.5px 5px;
+  margin: 1px 0;
   padding: 5px;
+}
+
+.transaction-table-daily-header-row:hover {
+  transform: scale(1.02);
 }
 
 .transaction-row-content-container {
   display: flex;
   flex-direction: column;
   width: 90%;
-  background-color: #CAEBF2;
+  background-color: rgba(255, 255, 255, 0.808);
   padding: 10px;
-  margin: auto;
+  margin: 5px auto 10px auto;
   border-top-right-radius: 15px;
-  border: 1px solid #07889B;
   box-shadow: 8px 4px 5px rgba(128, 128, 128, 0.541);
 }
 
@@ -234,15 +348,29 @@ button:hover {
 }
 
 .transaction-table-row > * > * {
-  flex: 1;
   text-align: center;
   margin: 5px;
 }
-
-.transaction-info > * {
-  width: 75px;
+.transaction-info {
+  display: flex;
+  justify-content: space-between;
+  width: 100%;
+}
+.transaction-info > div {
   padding: 2.5px;
+  flex: 1;
+  font-size: 15px;
   font-weight: bold;
+  overflow: hidden;
+  margin: 0;
+}
+.transaction-info > div > input {
+  width: 100%;
+  background-color: transparent;
+  border: 1px solid black;
+  border-radius: 5px;
+  padding: 5px;
+  box-sizing: border-box;
 }
 
 .transaction-buttons-container {
@@ -261,13 +389,13 @@ button:hover {
   display: flex;
   font-size: 15px;
   justify-content: space-between;
-  width: 95%;
+  width: 100%;
   padding: 5px;
   font-weight: bold;
   text-decoration-line: underline;
   background-color: rgb(175, 229, 241);
   border-radius: 5px;
-  border: 2px solid #07889B;
+  border: 2px solid #0973B3;
 }
 
 .transaction-table-entry-row {
@@ -286,11 +414,17 @@ button:hover {
 }
 
 .banded-true {
-  background-color: rgb(184, 184, 184);
+  background-color: #0973B3;
+  color: white;
 }
-
+.banded-true:hover {
+  background-color: rgb(66, 154, 209);
+}
 .banded-false {
-  background-color: #EFEFEF;
+  background-color: whitesmoke;
+}
+.banded-false:hover {
+  background-color: rgb(206, 206, 206);
 }
 
 .toggle-transactions-button-show {
@@ -326,16 +460,12 @@ button:hover {
   margin-bottom: auto;
 }
 
-/* .transaction-table-container > * > * > div {
-  margin: 5px 5px;
-} */
-
 .row-hidden {
   display: none;
 }
 
 .transaction-row-today {
-  background-color: #07889B;
+  background-color: #2AD705;
   color: white;
 }
 
@@ -385,11 +515,23 @@ button:hover {
 ====================== CREATE BUDGET COMPONENT ==================
 =================================================================
  */
-
-small {
-  font-size: 5px;
-  font-style: italic;
+.dashboard-component {
+  min-height: 100vh;
 }
+
+.chart-container {
+  background-color: white;
+  width: 90%;
+  margin: 20px auto;
+  border-radius: 10px;
+  border: 3px solid #0973B3;
+
+}
+/* 
+=================================================================
+====================== CREATE BUDGET COMPONENT ==================
+=================================================================
+ */
 
 .create-budget-component {
   width: 100vw;
@@ -411,7 +553,7 @@ small {
   width: 90%;
   margin: auto;
   background-color: rgba(202, 235, 242, 0.842);
-  border: solid 5px #07889B;
+  border: solid 5px #0973B3;
   border-top-right-radius: 20px;
   box-shadow: 8px 4px 5px rgba(128, 128, 128, 0.548);
 }
@@ -448,17 +590,19 @@ small {
 
 .budget-buttons-container {
   flex: 1;
+  padding-top: 10px;
 }
 
 .budget-buttons-container > * {
   font-size: 15px;
   font-weight: bold;
-  background-color: #07889B;
+  background-color: #0973B3;
   color: white;
   box-shadow: 4px 4px 5px rgba(128, 128, 128, 0.637);
   margin: 3px;
-  border: 1px solid white;
+  border: 2px solid white;
   padding: 2px;
+  border-radius: 5px;
 }
 
 .budget-buttons-container button:hover {
@@ -473,10 +617,6 @@ small {
   width: 100% !important;
 }
 
-.days-selector {
-  display: inline-block;
-}
-
 .entry-container input {
   border-radius: 5px;
   border: 1px solid grey;
@@ -489,11 +629,14 @@ small {
   padding: 5px;
 }
 
-hr {
-  width: 85%;
-  height: 4px;
+.category {
+  width: 200px !important;
 }
- 
+
+.days-selector {
+  display: inline-block;
+}
+
 .days-selector input {
   display: none!important;
 }

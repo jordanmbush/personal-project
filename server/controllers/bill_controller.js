@@ -6,13 +6,14 @@ module.exports = {
     if(req.body.bills) {
       const db = req.app.get('db');
       const bills = req.body.bills;
+      console.log('bills: ', bills);
       // DELETE ALL OF THE BILLS FIRST. WHEN BILLS ARE EDITED, THEY ARE ALL SENT BACK, SO IF THE USER DIDN'T DELETE THEM
       // THEY WILL ALL BE ADDED BACK WITH ANY CHANGES MADE
       db.delete_all_user_bills(user_id).then( response => {
         // ADD EACH BILL
         for(let billNum = 0; billNum < bills.length; billNum++) {
-          const { name, amount, frequencyType, startDate, endDate, category, frequencyDays } = bills[billNum];
-          db.add_bill(user_id, name, amount, frequencyType, startDate, endDate, category).then( bill => {
+          const { name, amount, frequencyType, startDate, endDate, category, subCategory, frequencyDays } = bills[billNum];
+          db.add_bill(user_id, name, amount, frequencyType, startDate, endDate, category, subCategory).then( bill => {
             // ONCE THE BILL IS ADDED, WELL RECEIVE THAT RECORD BACK WITH IT'S ID, AND WILL ADD FREQUENCY DAYS WITH THE BILL ID
             // AS TH FOREIGN KEY
             for(let day = 0; day < frequencyDays.length; day++) {

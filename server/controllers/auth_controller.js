@@ -3,7 +3,6 @@ const axios = require('axios');
 module.exports = {
   connect: (req, res) => {
     const authorizationCode = req.query.code;
-    console.log('/auth/callback endpoint hit! heres the code we received: ', authorizationCode);
     
     axios.post(`https://${process.env.REACT_APP_AUTH_DOMAIN}/oauth/token`, {
       client_id: process.env.REACT_APP_AUTH_CLIENT_ID,

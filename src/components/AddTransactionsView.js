@@ -147,7 +147,7 @@ export default class AddTransactionsView extends Component {
     
     for(let day = new Date(dayFrom); day <= dayThrough; day.setDate(day.getDate() + 1)) {
       if(day.getDay() === template.day_num && day >= new Date(template.start_date)) {
-        transactions.push({ transactionType, name: template.name, amount: currency(template.amount).value, category: template.category, day: new Date(day) });
+        transactions.push({ transactionType, name: template.name, amount: currency(template.amount).value, category: template.category, subCategory: template.sub_category, day: new Date(day) });
       }
     }
     return transactions;
@@ -161,10 +161,10 @@ export default class AddTransactionsView extends Component {
     for(let day = new Date(dayFrom); day <= dayThrough; day.setDate(day.getDate() + 1)) {
       dayIsLastDayOfMonth = day.getDate() === (new Date(day.getFullYear(), day.getMonth() + 1 , 0)).getDate();
       if(template.day_num > day.getDate() && dayIsLastDayOfMonth && day >= new Date(template.start_date)){
-        transactions.push({ transactionType, name: template.name, amount: currency(template.amount).value, category: template.category, day: new Date(day) });
+        transactions.push({ transactionType, name: template.name, amount: currency(template.amount).value, category: template.category, subCategory: template.sub_category, day: new Date(day) });
       }
       if(day.getDate() === template.day_num && day >= new Date(template.start_date)) {
-        transactions.push({ transactionType, name: template.name, amount: currency(template.amount).value, category: template.category, day: new Date(day) });
+        transactions.push({ transactionType, name: template.name, amount: currency(template.amount).value, category: template.category, subCategory: template.sub_category, day: new Date(day) });
       }
     }
     return transactions;
@@ -179,7 +179,7 @@ export default class AddTransactionsView extends Component {
       let timeDiff = Math.abs(day.getTime() - startDate.getTime());
       let diffDays = Math.ceil(timeDiff / (1000 * 3600 * 24)); 
       if(diffDays % 14 === 0 && day >= new Date(template.start_date)) {
-        transactions.push({ transactionType, name: template.name, amount: currency(template.amount).value, category: template.category, day: new Date(day) });
+        transactions.push({ transactionType, name: template.name, amount: currency(template.amount).value, category: template.category, subCategory: template.sub_category, day: new Date(day) });
       }
     }
     return transactions;
@@ -194,7 +194,7 @@ export default class AddTransactionsView extends Component {
       let timeDiff = Math.abs(day.getTime() - startDate.getTime());
       let diffDays = Math.ceil(timeDiff / (1000 * 3600 * 24)); 
       if(diffDays % template.day_num === 0 && day >= new Date(template.start_date)) {
-        transactions.push({ transactionType, name: template.name, amount: currency(template.amount).value, category: template.category, day: new Date(day) });
+        transactions.push({ transactionType, name: template.name, amount: currency(template.amount).value, category: template.category, subCategory: template.sub_category, day: new Date(day) });
       }
     }
     return transactions;
@@ -225,7 +225,7 @@ export default class AddTransactionsView extends Component {
   initializeTransactions(transactionsInput = []) {
     let transactions = transactionsInput.length ? transactionsInput : this.state.transactions.slice();
     let balanceDate = new Date(this.state.balanceInfo.date);
-    let balanceAmount = currency(this.state.balanceInfo.amount);
+    let balanceAmount = this.state.balanceInfo.amount ? currency(this.state.balanceInfo.amount) : 0;
     let startDate = new Date(balanceDate.getFullYear(), balanceDate.getMonth(), 1);
     // IF THERE ARE NO TRANSACTIONS YET, SET lastTransactionDate TO TODAY;
     let lastTransactionDate = transactions.length ? new Date(transactions[transactions.length -1].date) : new Date();
@@ -264,10 +264,10 @@ export default class AddTransactionsView extends Component {
         lastDayOfCurrentMonth = new Date(year, month + 1, 0);
         for(let day = new Date(year, month, 1); day <= lastDayOfCurrentMonth; day.setDate(day.getDate() + 1)) {
           for(let j = 0; j < transactions.length; j ++) {
-            const { name, amount, date, type, category, id } = transactions[j];
+            const { name, amount, date, type, category, subCategory, id } = transactions[j];
             if(new Date(date).isSameDateAs(day)) {
               balanceAmount = currency(balanceAmount).add(amount).value;
-              formattedTransactions.push({ id, transactionType: type, balance: balanceAmount, name, amount: currency(amount).value, category, day: new Date(date)  });
+              formattedTransactions.push({ id, transactionType: type, balance: balanceAmount, name, amount: currency(amount).value, category, subCategory, day: new Date(date)  });
             }
           }
         }
@@ -310,7 +310,7 @@ export default class AddTransactionsView extends Component {
 
     let daysInMonth = lastDayOfSelectedMonth.getDate();
     let transactionTable = [];
-    let balanceDate = new Date(this.state.balanceInfo.date);
+    let balanceDate = this.state.balanceInfo.date ? new Date(this.state.balanceInfo.date) : new Date(firstDayOfSelectedMonth);
     let balance = null;
     let day = new Date(firstDayOfSelectedMonth);
     day.setDate(day.getDate() -1); //START DAY OFF AS LAST DAY OF PREVIOUS MONTH
@@ -343,15 +343,15 @@ export default class AddTransactionsView extends Component {
       let dailyTotal = 0;
       let dailyTransactions = [];
       let dayID = DateFunctions.formatDate(day);
-      const expandDayButton = <button id={dayID + '-toggle-button'} className='toggle-transactions-button-show' onClick={ e => this.toggleTableRowVisibility(e.currentTarget) }>+</button>;
       const subTransactionHeader = (
         <div className='transaction-table-row-header'>
           <div className='sub-transaction-header-title'>Balance</div>
           <div className='sub-transaction-header-title'>Name</div>
           <div className='sub-transaction-header-title'>Amount</div>
           <div className='sub-transaction-header-title'>Category</div>
+          <div className='sub-transaction-header-title'>Sub-Cat.</div>
         </div>
-      )
+      );
       // ==========================================================================
       // ==================== FOR EVERY TRANSACTION OF THE DAY ====================
       // ==========================================================================
@@ -368,10 +368,11 @@ export default class AddTransactionsView extends Component {
         dailyTransactions.push(
           <div className='transaction-table-row' id={`${dayID}-${i}`}>
             <div className='transaction-info'>
-                <input disabled id={`${currentMonthTransactionKey}-balance`} className='transaction-balance' onChange={e => this.updateTransactionValues(e)} value={currency(this.state.currentMonthTransactions[currentMonthTransactionKey].balance).format(true)}></input>
-                <input disabled id={`${currentMonthTransactionKey}-name`} className='transaction-name' onChange={e => this.updateTransactionValues(e)} value={this.state.currentMonthTransactions[currentMonthTransactionKey].name}></input>
-                <input disabled id={`${currentMonthTransactionKey}-amount`} className='transaction-amount' onChange={e => this.updateTransactionValues(e)} value={currency(this.state.currentMonthTransactions[currentMonthTransactionKey].amount).value} type='number'></input>
-                <input disabled id={`${currentMonthTransactionKey}-category`} className='transaction-category' onChange={e => this.updateTransactionValues(e)} value={this.state.currentMonthTransactions[currentMonthTransactionKey].category}></input>
+                <div><input disabled id={`${currentMonthTransactionKey}-balance`} className='transaction-balance' onChange={e => this.updateTransactionValues(e)} value={currency(this.state.currentMonthTransactions[currentMonthTransactionKey].balance).format(true)}></input></div>
+                <div><input disabled id={`${currentMonthTransactionKey}-name`} className='transaction-name' onChange={e => this.updateTransactionValues(e)} value={this.state.currentMonthTransactions[currentMonthTransactionKey].name}></input></div>
+                <div><input disabled id={`${currentMonthTransactionKey}-amount`} className='transaction-amount' onChange={e => this.updateTransactionValues(e)} value={currency(this.state.currentMonthTransactions[currentMonthTransactionKey].amount).value} type='number'></input></div>
+                <div><input disabled id={`${currentMonthTransactionKey}-category`} className='transaction-category' onChange={e => this.updateTransactionValues(e)} value={this.state.currentMonthTransactions[currentMonthTransactionKey].category}></input></div>
+                <div><input disabled id={`${currentMonthTransactionKey}-subCategory`} className='transaction-subcCategory' onChange={e => this.updateTransactionValues(e)} value={this.state.currentMonthTransactions[currentMonthTransactionKey].subCategory}></input></div>
             </div>
             <div className='transaction-buttons-container'>
               <div className='income-radio radio-container'>
@@ -418,7 +419,6 @@ export default class AddTransactionsView extends Component {
           <div style={dayBalanceStyle} className='transaction-table-balance-column'>{currency(balance).format(true)}</div>
           <div className='transaction-table-name-column'>{billsForDay.length > 1 && 'Multiple Transactions...' || billName}</div>
           <div className='transaction-table-amount-column'>{currency(dailyTotal).format(true)}</div>
-          {expandDayButton}
         </div>
       );
       // ===========================================================================
@@ -434,6 +434,7 @@ export default class AddTransactionsView extends Component {
               <input id={dayID + '-entry-name'}      placeholder="name - e.g. 'Water'"></input>
               <input id={dayID + '-entry-amount'}    placeholder='amount' type='number'></input>
               <input id={dayID + '-entry-category'}  placeholder='category'></input>
+              <input id={dayID + '-entry-subCategory'}  placeholder='subcategory'></input>
               <div className='income-radio radio-container'>
                 <label htmlFor={dayID + '-radio-income'}>Income</label>
                 <input id={dayID + '-radio-income'}  type='radio' name={`${dayID}-transaction-type`}></input>
@@ -642,26 +643,18 @@ export default class AddTransactionsView extends Component {
   }
   
   toggleTableRowVisibility(target) {
-    let id = target.id.replace('-toggle-button', '');
-    id = id.replace('-header-row', '');
-    let toggleButton = document.getElementById(id + '-toggle-button');
+    let id = target.id.replace('-header-row', '');
     let contentContainer = document.getElementById(id + '-content-container');
     
     // 'transaction-row-content-container'
     let contentContainerClassList = contentContainer.className.split(' ');
-    let buttonClassList = toggleButton.className.split(' ');
 
-
-    if(buttonClassList.indexOf('toggle-transactions-button-hide') !== -1) {
+    if(contentContainerClassList.indexOf('row-showing') !== -1) {
       contentContainerClassList.splice(contentContainerClassList.indexOf('row-showing'), 1, 'row-hidden');
       contentContainer.className = contentContainerClassList.join(' ');
-      toggleButton.className = 'toggle-transactions-button-show';
-      toggleButton.innerText = '+';
-    } else if(buttonClassList.indexOf('toggle-transactions-button-show') !== -1) {
+    } else if(contentContainerClassList.indexOf('row-hidden') !== -1) {
       contentContainerClassList.splice(contentContainerClassList.indexOf('row-hidden'), 1, 'row-showing');
       contentContainer.className = contentContainerClassList.join(' ');
-      toggleButton.className = 'toggle-transactions-button-hide';
-      toggleButton.innerText = '-';
     }
   }
   

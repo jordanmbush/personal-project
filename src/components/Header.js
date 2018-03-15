@@ -20,7 +20,7 @@ export default class Header extends Component {
   render() {
     return (
       <div className='header'>
-        <Link to='/dashboard'><button className='dashboard-button'><i className="fas fa-tachometer-alt"></i>Dashboard</button></Link>
+        <Link to='/dashboard'><button className='dashboard-button'><i className="fas fa-tachometer-alt"></i></button></Link>
         <div><h1>Monilibrium</h1></div>
         <button className='logout-button' onClick={this.logout}><i className="fas fa-sign-out-alt"></i></button>
       </div>

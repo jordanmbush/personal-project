@@ -28,10 +28,10 @@ module.exports = {
   addTransaction: (req, res) => {
     const { user_id } = req.session.user;
     // const user_id = 'github|34669268'; //TESTING - REMOVE!!!!!!!!!!!!!!!!!!!!!!!!!
-    const { name, amount, date, category, type } = req.body;
+    const { name, amount, date, category, subCategory, type } = req.body;
     
     const db = req.app.get('db');
-    db.add_transaction(user_id, name, amount, date, category, type).then( transaction => {
+    db.add_transaction(user_id, name, amount, date, category, subCategory, type).then( transaction => {
       res.json(transaction);
     }).catch( err => {
       console.log('transaction_controller.js - addTransaction err: ', err);
@@ -45,9 +45,9 @@ module.exports = {
     let addedTransactions = [];
     const db = req.app.get('db');
     for(let i = 0; i < transactions.length; i++) {
-      const { name, amount, day, category, type } = transactions[i];
+      const { name, amount, day, category, subCategory, type } = transactions[i];
       
-      db.add_transaction([user_id, name, amount, day, category, type]).then( transaction => {
+      db.add_transaction([user_id, name, amount, day, category, subCategory, type]).then( transaction => {
         addedTransactions = addedTransactions.concat(transaction);
       }).catch( err => {
         console.log('transaction_controller.js - addTransaction err: ', err);
@@ -73,10 +73,10 @@ module.exports = {
   updateTransaction: (req, res) => {
     const { user_id } = req.session.user;
     // const user_id = 'github|34669268'; //TESTING - REMOVE!!!!!!!!!!!!!!!!!!!!!!!!!
-    const { id, name, amount, date, category, type } = req.body;
+    const { id, name, amount, date, category, subCategory, type } = req.body;
     
     const db = req.app.get('db');
-    db.update_transaction([name, amount, date, type, category, user_id, id]).then( updatedTransaction => {
+    db.update_transaction([name, amount, date, type, category, subCategory, user_id, id]).then( updatedTransaction => {
       res.json(updatedTransaction[0]);
     }).catch( err => {
       console.log('transaction_controller.js - updateTransaction err: ', err);

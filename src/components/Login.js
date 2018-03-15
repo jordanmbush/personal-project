@@ -33,28 +33,72 @@ export default class Login extends Component {
     return (
       <div className='login-component'>
         <h1>Monilibrium</h1>
-        <div className='login-button-container'>
-          <div className='login-into'><p>Let's do this! Not a member? Psst. No problem. Login with one of many major online platforms.</p></div>
-          <button onClick={this.login}>Login / Register</button>
+        <div className='hero-panel'>
+          <div className='welcome-container'>
+            <h2>Welcome</h2>
+          </div>
+          <div className='login-blur-box'>
+          </div>
+          <div className='login-button-container'>
+            <div className='color-strip-container'>
+              <div></div>
+              <div></div>
+              <div></div>
+              <div></div>
+            </div>
+            <div className='login-container-message'>
+              <span>Go ahead and click that blue button right there. It's easy.</span>
+            </div>
+            <button onClick={this.login}>Login / Register</button>
+          </div>
         </div>
         <div id='panel-1' className='panel'>
-          <h2>50% of Americans have less than one month's income saved!</h2>
           <div className='panel-content'>
-            <img src='http://ak3.picdn.net/shutterstock/videos/9802973/thumb/1.jpg' alt='Savings Jar with a few coins'></img>
-            <p>Top personal finance advisors will tell you - and especially drawing from lessons in the economic crisis to have at least six months income saved, just in case.</p>
+            <h2>50% of Americans have less than one month's income saved!</h2>
+            <div className='panel-main-info'>
+              <img src='http://ak3.picdn.net/shutterstock/videos/9802973/thumb/1.jpg' alt='Savings Jar with a few coins'></img>
+              <p>Top personal finance advisors will tell you - and especially drawing from lessons in the economic crisis to have at least six months income saved, just in case.</p>
+            </div>
+            <aside><a href='http://www.businessinsider.com/a-dozen-shocking-personal-finance-statistics-2011-5'>www.businessinsider.com</a></aside>
           </div>
-          <aside><a href='http://www.businessinsider.com/a-dozen-shocking-personal-finance-statistics-2011-5'>www.businessinsider.com</a></aside>
         </div>
         <div id='panel-2' className='panel'>
-          <div>
+          <div className='panel-content'>
+            <h2>Alarming statistics regarding Millennials and their Finances</h2>
+            <div className='panel-main-info'>
+              <img src='https://c1.staticflickr.com/3/2268/3537904106_57fe05b12b_b.jpg' alt='Millennial stressed with credit card in hand'></img>
+              <div>
+                <h3>'Mellennials Show Alarming Gap Between Financial Confidence and Knowledge' according to Nefe.org</h3>
+                <ul>
+                  <li>-53% of Millennials feel they have too much debt</li>
+                  <li>-When asked if they could come up with $2,000 if an unexpected need arose within 30 days, nearly half (48 percent) said they probably or certainly could not come up with the funds</li>
+                  <li>-Less than one-third (32 percent) have set aside funds to cover three months of household expenses</li>
+                  <li>-Nearly 30 percent of those with bank accounts had overdrawn their account in the prior 12 months</li>
+                  <li>-Only 24 percent of respondents showed basic financial literacy in the study, with just 8 percent showing a high level of knowledge. Yet, 69 percent gave themselves a high self-assessment of financial knowledge</li>
+                </ul>
+              </div>
+            </div>
+            <aside><a href='http://www.businessinsider.com/a-dozen-shocking-personal-finance-statistics-2011-5'>www.businessinsider.com</a></aside>
           </div>
         </div>
         <div id='panel-3' className='panel'>
-          <div>
+          <div className='panel-content'>
+            <h2>50% of Americans have less than one month's income saved!</h2>
+            <div className='panel-main-info'>
+              <img src='http://ak3.picdn.net/shutterstock/videos/9802973/thumb/1.jpg' alt='Savings Jar with a few coins'></img>
+              <p>Top personal finance advisors will tell you - and especially drawing from lessons in the economic crisis to have at least six months income saved, just in case.</p>
+            </div>
+            <aside><a href='http://www.businessinsider.com/a-dozen-shocking-personal-finance-statistics-2011-5'>www.businessinsider.com</a></aside>
           </div>
         </div>
         <div id='panel-4' className='panel'>
-          <div>
+          <div className='panel-content'>
+            <h2>50% of Americans have less than one month's income saved!</h2>
+            <div className='panel-main-info'>
+              <img src='http://ak3.picdn.net/shutterstock/videos/9802973/thumb/1.jpg' alt='Savings Jar with a few coins'></img>
+              <p>Top personal finance advisors will tell you - and especially drawing from lessons in the economic crisis to have at least six months income saved, just in case.</p>
+            </div>
+            <aside><a href='http://www.businessinsider.com/a-dozen-shocking-personal-finance-statistics-2011-5'>www.businessinsider.com</a></aside>
           </div>
         </div>
       </div>

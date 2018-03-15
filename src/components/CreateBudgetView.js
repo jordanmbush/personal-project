@@ -4,6 +4,8 @@ import DateFunctions from './../helpers/DateFunctions';
 import DaySelectorByWeek from './dateComponents/DaySelectorByWeek';
 import DaySelectorByMonth from './dateComponents/DaySelectorByMonth';
 import Header from './Header';
+import categories from './../helpers/categories';
+import _ from 'lodash';
 
 const lables = {
   DAY: 'a Day',
@@ -13,7 +15,6 @@ const lables = {
   EOW: 'every other week',
   XDAYS: '',
 }
-
 const dayAdjectives = {
   DAY: 'Daily',
   WEEK: 'Weekly',
@@ -23,10 +24,8 @@ const dayAdjectives = {
   XDAYS: 'Every So Many Days',
 }
 
-const DAY = 'DAY';
 const WEEK = 'WEEK';
 const MONTH = 'MONTH';
-const YEAR = 'YEAR';
 const EOW = 'EOW';
 const XDAYS = 'XDAYS';
 
@@ -41,6 +40,7 @@ export default class CreateBudgetView extends Component {
         startDate: DateFunctions.formatDate(new Date()),
         endDate: null,
         category: '',
+        subCategory: '',
         frequencyDays: [],
       },
       bills: [],
@@ -71,54 +71,62 @@ export default class CreateBudgetView extends Component {
     this.deleteCurrentIncomeSource = this.deleteCurrentIncomeSource.bind(this);
     // ====================== INCOME AND BILL METHODS ==========================
     this.saveBudgetTemplate = this.saveBudgetTemplate.bind(this);
+    //======================= CATEGORY METHODS =================================
+    this.getCategories = this.getCategories.bind(this);
+    this.getSubCategories = this.getSubCategories.bind(this);
   }
 
   componentDidMount() {
-    axios.get('/api/income').then( incomeSources => {
-      console.log('income: ', incomeSources.data);
-      let incomeSourcesWithFrequencies = [];
-      // LOOP THROUGH EACH BILL THAT COMES OVER
-      for(let i = 0; i < incomeSources.data.length; i++) {
-        const { amount, income_id, day_num, frequency_type, id, name, start_date } = incomeSources.data[i];
-        let index = incomeSourcesWithFrequencies.findIndex(income => income.name === name);
-        // CHECK IF THE BILL HAS ALREADY BEEN ADDED TO incomeSourcesWithFrequencies
-        if(index === -1) {
-          // IF THE BILL IS NOT ALREADY IN THE ARRAY incomeSourcesWithFrequencies, ADD IT
-          incomeSourcesWithFrequencies.push({name, amount, frequencyType: frequency_type, start_date, frequencyDays: [day_num]});
-        } else {
-          // IF THE BILL IS ALREADY IN THE ARRAY, JUST ADD THE day_num TO THE frequencyDays FOR THAT BILL.
-          incomeSourcesWithFrequencies[index].frequencyDays.push(day_num);
-       }
-      }
-      console.log('incomeSourcesWithFrequencies: ', incomeSourcesWithFrequencies);
-      this.setState({
-        incomeSources: incomeSourcesWithFrequencies,
-        currentIncomeSource: this.getCurrentIncomeDefaults()
-      })
-      // DO THE AXIOS CALL FOR INCOME FIRST - DISPLAY THAT, THEN DISPLAY THE BILLS
-      axios.get('/api/bills').then( bills => {
-        console.log('bills: ', bills.data);
-        let billsWithFrequencies = [];
+    axios.get('/api/user-data').then( userInfo => {
+      axios.get('/api/income').then( incomeSources => {
+        console.log('income: ', incomeSources.data);
+        let incomeSourcesWithFrequencies = [];
         // LOOP THROUGH EACH BILL THAT COMES OVER
-        for(let i = 0; i < bills.data.length; i++) {
-          const { amount, bill_id, category, day_num, end_date, frequency_type, id, name, start_date } = bills.data[i];
-          let index = billsWithFrequencies.findIndex(bill => bill.name === name);
-          // CHECK IF THE BILL HAS ALREADY BEEN ADDED TO billsWithFrequencies
+        for(let i = 0; i < incomeSources.data.length; i++) {
+          const { amount, income_id, day_num, frequency_type, id, name, start_date } = incomeSources.data[i];
+          let index = incomeSourcesWithFrequencies.findIndex(income => income.name === name);
+          // CHECK IF THE BILL HAS ALREADY BEEN ADDED TO incomeSourcesWithFrequencies
           if(index === -1) {
-            // IF THE BILL IS NOT ALREADY IN THE ARRAY billsWithFrequencies, ADD IT
-            billsWithFrequencies.push({name, amount, frequencyType: frequency_type, start_date, end_date, category, frequencyDays: [day_num]});
+            // IF THE BILL IS NOT ALREADY IN THE ARRAY incomeSourcesWithFrequencies, ADD IT
+            incomeSourcesWithFrequencies.push({name, amount, frequencyType: frequency_type, start_date, frequencyDays: [day_num]});
           } else {
             // IF THE BILL IS ALREADY IN THE ARRAY, JUST ADD THE day_num TO THE frequencyDays FOR THAT BILL.
-            billsWithFrequencies[index].frequencyDays.push(day_num);
-         }
+            incomeSourcesWithFrequencies[index].frequencyDays.push(day_num);
         }
-        console.log('billsWithFrequencies: ', billsWithFrequencies);
+        }
+        console.log('incomeSourcesWithFrequencies: ', incomeSourcesWithFrequencies);
         this.setState({
-          bills: billsWithFrequencies,
-          currentBill: this.getCurrentBillDefaults()
+          incomeSources: incomeSourcesWithFrequencies,
+          currentIncomeSource: this.getCurrentIncomeDefaults()
         })
-      }).catch( err => console.log('createbudgetview.js - get bills err: ', err));
-    }).catch( err => console.log('createbudgetview.js - get income err: ', err));
+        // DO THE AXIOS CALL FOR INCOME FIRST - DISPLAY THAT, THEN DISPLAY THE BILLS
+        axios.get('/api/bills').then( bills => {
+          console.log('bills: ', bills.data);
+          let billsWithFrequencies = [];
+          // LOOP THROUGH EACH BILL THAT COMES OVER
+          for(let i = 0; i < bills.data.length; i++) {
+            const { amount, bill_id, category, sub_category, day_num, end_date, frequency_type, id, name, start_date } = bills.data[i];
+            let index = billsWithFrequencies.findIndex(bill => bill.name === name);
+            // CHECK IF THE BILL HAS ALREADY BEEN ADDED TO billsWithFrequencies
+            if(index === -1) {
+              // IF THE BILL IS NOT ALREADY IN THE ARRAY billsWithFrequencies, ADD IT
+              billsWithFrequencies.push({name, amount, frequencyType: frequency_type, start_date, end_date, category, subCategory: sub_category, frequencyDays: [day_num]});
+            } else {
+              // IF THE BILL IS ALREADY IN THE ARRAY, JUST ADD THE day_num TO THE frequencyDays FOR THAT BILL.
+              billsWithFrequencies[index].frequencyDays.push(day_num);
+          }
+          }
+          console.log('billsWithFrequencies: ', billsWithFrequencies);
+          this.setState({
+            bills: billsWithFrequencies,
+            currentBill: this.getCurrentBillDefaults()
+          })
+        }).catch( err => console.log('createbudgetview.js - get bills err: ', err));
+      }).catch( err => console.log('createbudgetview.js - get income err: ', err));
+    }).catch( err => {
+      console.log('createbudgetview.js - get user-data err: ', err);
+      this.props.history.push('/');
+    });
   }
   
   getCurrentBillDefaults() {
@@ -130,7 +138,8 @@ export default class CreateBudgetView extends Component {
         frequencyType: MONTH,
         startDate: today,
         endDate: null,
-        category: 'Bills',
+        category: '',
+        subCategory: '',
         frequencyDays: [],
     }
   }
@@ -426,6 +435,28 @@ export default class CreateBudgetView extends Component {
       }
     }
   }
+
+  getCategories() {
+    let categoriesJSX = _.keys(categories);
+    categoriesJSX = categoriesJSX.map( key => {
+      return (
+        <option>{key}</option>
+      )
+    })
+    return categoriesJSX;
+  }
+  getSubCategories() {
+    let subCategories = categories[this.state.currentBill.category];
+    let subCategoriesJSX = []
+    if(subCategories) {
+      subCategoriesJSX = subCategories.map( subCat => {
+        return (
+          <option>{subCat}</option>
+        )
+      })
+    }
+    return subCategoriesJSX;
+  }
   
   render() {
     const expenseDaySelector = this.getDaySelectorComponent('currentBill');
@@ -465,8 +496,8 @@ export default class CreateBudgetView extends Component {
           </div>
           <div className='summary-management-container'>
             <div className='budget-buttons-container bill-buttons-container'>
-              <button onClick={this.addCurrentIncomeSourceToIncomeSources}>Add Income Source</button>
-              <button onClick={this.deleteCurrentIncomeSource}>Delete Income Source</button>
+              <button onClick={this.addCurrentIncomeSourceToIncomeSources}>Add Income</button>
+              <button onClick={this.deleteCurrentIncomeSource}>Delete Income</button>
               <button onClick={this.resetIncomeFields}>Clear Fields</button>
             </div>
             <div className='income-list-container list-container'>
@@ -510,7 +541,14 @@ export default class CreateBudgetView extends Component {
           </div>
           <div>
             <label>Category</label>
-            <input id='bill-category' className='create-budget-field' value={this.state.currentBill.category} onChange={ e => this.updateCurrentBillValues(e)}></input>
+            <select id='bill-category' className='create-budget-field category category-select' value={this.state.currentBill.category} onChange={ e => this.updateCurrentBillValues(e)}>
+              <option selected> -- select an option -- </option>
+              {this.getCategories()}
+            </select>
+            <select id='bill-subCategory' className='create-budget-field category sub-category-select' value={this.state.currentBill.subCategory} onChange={ e => this.updateCurrentBillValues(e)}>
+              <option selected> -- select an option -- </option>
+              {this.getSubCategories()}
+            </select>
           </div>
           <div className='summary-management-container'>
             <div className='budget-buttons-container bill-buttons-container'>
