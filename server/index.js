@@ -18,6 +18,7 @@ massive(process.env.CONNECTION_STRING).then(db => {
   app.set('db', db);
 });
 
+
 const app = express();
 app.use(bodyParser.json());
 app.use(session({
@@ -29,8 +30,8 @@ app.use(session({
     maxAge: 1000 * 60 * 60 * 24 * 7
   }
 }));
-// app.use(express.static(`${__dirname}/../build`));
 
+app.use(express.static(`${__dirname}/../build`));
 // ENDPOINTS
 app.get('/auth/callback', auth_controller.connect);
 app.get('/api/user-data', checkSession, user_controller.getUser);
@@ -50,6 +51,12 @@ app.delete('/api/transaction/:id', checkSession, transaction_controller.deleteTr
 app.get('/api/balance', checkSession, balance_controller.getBalance);
 
 app.post('/api/logout', checkSession, user_controller.logout);
+
+// ==============================================================
+const path = require('path')
+app.get('*', (req, res)=>{
+  res.sendFile(path.join(__dirname, '../build/index.html'));
+})
 
 const PORT = 4000;
 app.listen( PORT, console.log(`Listening on port ${PORT}.`));
