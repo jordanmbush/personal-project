@@ -5,6 +5,7 @@ import DaySelectorByWeek from './dateComponents/DaySelectorByWeek';
 import DaySelectorByMonth from './dateComponents/DaySelectorByMonth';
 import Header from './Header';
 import categories from './../helpers/categories';
+import currency from 'currency.js';
 import _ from 'lodash';
 
 const lables = {
@@ -52,6 +53,10 @@ export default class CreateBudgetView extends Component {
         startDate: DateFunctions.formatDate(new Date()),
         frequencyDays: []
       },
+      balanceInfo: {
+        date: new Date(),
+        amount: 0,
+      },
     }
     // ======================== BILL METHODS ===============================
     this.updateCurrentBillValues = this.updateCurrentBillValues.bind(this);
@@ -74,53 +79,55 @@ export default class CreateBudgetView extends Component {
     //======================= CATEGORY METHODS =================================
     this.getCategories = this.getCategories.bind(this);
     this.getSubCategories = this.getSubCategories.bind(this);
+    //======================= BALANCE METHODS =================================
+    this.updateCurrentBalanceValues = this.updateCurrentBalanceValues.bind(this);
   }
 
   componentDidMount() {
     axios.get('/api/user-data').then( userInfo => {
       axios.get('/api/income').then( incomeSources => {
-        console.log('income: ', incomeSources.data);
-        let incomeSourcesWithFrequencies = [];
-        // LOOP THROUGH EACH BILL THAT COMES OVER
-        for(let i = 0; i < incomeSources.data.length; i++) {
-          const { amount, income_id, day_num, frequency_type, id, name, start_date } = incomeSources.data[i];
-          let index = incomeSourcesWithFrequencies.findIndex(income => income.name === name);
-          // CHECK IF THE BILL HAS ALREADY BEEN ADDED TO incomeSourcesWithFrequencies
-          if(index === -1) {
-            // IF THE BILL IS NOT ALREADY IN THE ARRAY incomeSourcesWithFrequencies, ADD IT
-            incomeSourcesWithFrequencies.push({name, amount, frequencyType: frequency_type, start_date, frequencyDays: [day_num]});
-          } else {
-            // IF THE BILL IS ALREADY IN THE ARRAY, JUST ADD THE day_num TO THE frequencyDays FOR THAT BILL.
-            incomeSourcesWithFrequencies[index].frequencyDays.push(day_num);
-        }
-        }
-        console.log('incomeSourcesWithFrequencies: ', incomeSourcesWithFrequencies);
-        this.setState({
-          incomeSources: incomeSourcesWithFrequencies,
-          currentIncomeSource: this.getCurrentIncomeDefaults()
-        })
-        // DO THE AXIOS CALL FOR INCOME FIRST - DISPLAY THAT, THEN DISPLAY THE BILLS
         axios.get('/api/bills').then( bills => {
-          console.log('bills: ', bills.data);
-          let billsWithFrequencies = [];
-          // LOOP THROUGH EACH BILL THAT COMES OVER
-          for(let i = 0; i < bills.data.length; i++) {
-            const { amount, bill_id, category, sub_category, day_num, end_date, frequency_type, id, name, start_date } = bills.data[i];
-            let index = billsWithFrequencies.findIndex(bill => bill.name === name);
-            // CHECK IF THE BILL HAS ALREADY BEEN ADDED TO billsWithFrequencies
-            if(index === -1) {
-              // IF THE BILL IS NOT ALREADY IN THE ARRAY billsWithFrequencies, ADD IT
-              billsWithFrequencies.push({name, amount, frequencyType: frequency_type, start_date, end_date, category, subCategory: sub_category, frequencyDays: [day_num]});
-            } else {
-              // IF THE BILL IS ALREADY IN THE ARRAY, JUST ADD THE day_num TO THE frequencyDays FOR THAT BILL.
-              billsWithFrequencies[index].frequencyDays.push(day_num);
-          }
-          }
-          console.log('billsWithFrequencies: ', billsWithFrequencies);
-          this.setState({
-            bills: billsWithFrequencies,
-            currentBill: this.getCurrentBillDefaults()
-          })
+          axios.get('/api/balance').then( balanceInfo => {
+            let incomeSourcesWithFrequencies = [];
+            // LOOP THROUGH EACH INCOME SOURCE THAT COMES OVER
+            for(let i = 0; i < incomeSources.data.length; i++) {
+              const { amount, income_id, day_num, frequency_type, id, name, start_date } = incomeSources.data[i];
+              let index = incomeSourcesWithFrequencies.findIndex(income => income.name === name);
+              // CHECK IF THE BILL HAS ALREADY BEEN ADDED TO incomeSourcesWithFrequencies
+              if(index === -1) {
+                // IF THE BILL IS NOT ALREADY IN THE ARRAY incomeSourcesWithFrequencies, ADD IT
+                incomeSourcesWithFrequencies.push({name, amount, frequencyType: frequency_type, start_date, frequencyDays: [day_num]});
+              } else {
+                // IF THE BILL IS ALREADY IN THE ARRAY, JUST ADD THE day_num TO THE frequencyDays FOR THAT BILL.
+                incomeSourcesWithFrequencies[index].frequencyDays.push(day_num);
+              }
+            }
+
+            let billsWithFrequencies = [];
+            // LOOP THROUGH EACH BILL THAT COMES OVER
+            for(let i = 0; i < bills.data.length; i++) {
+              const { amount, bill_id, category, sub_category, day_num, end_date, frequency_type, id, name, start_date } = bills.data[i];
+              let index = billsWithFrequencies.findIndex(bill => bill.name === name);
+              // CHECK IF THE BILL HAS ALREADY BEEN ADDED TO billsWithFrequencies
+              if(index === -1) {
+                // IF THE BILL IS NOT ALREADY IN THE ARRAY billsWithFrequencies, ADD IT
+                billsWithFrequencies.push({name, amount, frequencyType: frequency_type, start_date, end_date, category, subCategory: sub_category, frequencyDays: [day_num]});
+              } else {
+                // IF THE BILL IS ALREADY IN THE ARRAY, JUST ADD THE day_num TO THE frequencyDays FOR THAT BILL.
+                billsWithFrequencies[index].frequencyDays.push(day_num);
+            }
+            }
+            let balanceData = balanceInfo.data;
+            balanceData.date = DateFunctions.formatDate(new Date(balanceData.date));
+
+            this.setState({
+              bills: billsWithFrequencies,
+              currentBill: this.getCurrentBillDefaults(),
+              incomeSources: incomeSourcesWithFrequencies,
+              currentIncomeSource: this.getCurrentIncomeDefaults(),
+              balanceInfo: balanceData,
+            })
+          }).catch( err => console.log('createbudgetview.js - get balance err: ', err));
         }).catch( err => console.log('createbudgetview.js - get bills err: ', err));
       }).catch( err => console.log('createbudgetview.js - get income err: ', err));
     }).catch( err => {
@@ -157,50 +164,65 @@ export default class CreateBudgetView extends Component {
   }
 
   saveBudgetTemplate() {
-    if(this.state.bills.length) {
-      axios.post('/api/bills', { bills: this.state.bills }).then( response => {
+    axios.get('/api/user-data').then( userInfo => {
+      axios.post('/api/balance', { ...this.state.balanceInfo }).then( response => {
         console.log('post bills successful');
-      }).catch( err => console.log('createbudgetview.js - error posting bills: ', err));
-    }
+      }).catch( err => console.log('createbudgetview.js - error posting balance: ', err));
 
-    if(this.state.incomeSources.length) {
-      axios.post('/api/income', { income: this.state.incomeSources }).then( response => {
-        console.log('post income successful');
-      }).catch( err => console.log('createbudgetview.js - error posting income: ', err));
-    }
+      if(this.state.bills.length) {
+        axios.post('/api/bills', { bills: this.state.bills }).then( response => {
+          console.log('post bills successful');
+        }).catch( err => console.log('createbudgetview.js - error posting bills: ', err));
+      }
+
+      if(this.state.incomeSources.length) {
+        axios.post('/api/income', { income: this.state.incomeSources }).then( response => {
+          console.log('post income successful');
+        }).catch( err => console.log('createbudgetview.js - error posting income: ', err));
+      }
+    }).catch( err => {
+      console.log('createbudgetview.js(saveBudgetTemplate) get user-data err: ', err);
+      this.props.history.push('/');
+    });
   }
 
   updateCurrentBillValues(e) {
     let currentBillCopy = Object.assign({}, this.state.currentBill);
-    let id = e.target.id.replace('bill-', '');
+    let prop = e.target.id.replace('bill-', '');
 
-    if(id === 'amount') {
-      currentBillCopy[id] = e.target.value.replace(/-/g, '');
+    if(prop === 'amount') {
+      currentBillCopy[prop] = e.target.value.replace(/-/g, '');
     } else {
-      currentBillCopy[id] = e.target.value;
+      currentBillCopy[prop] = e.target.value;
     }
     // IF THE FREQUENCY TYPE IS BEING CHANGE, RESET THE FREQUENCY DAYS
-    if(id === 'frequencyType') {
+    if(prop === 'frequencyType') {
       currentBillCopy.frequencyDays = []
     }
 
     this.setState({ currentBill: currentBillCopy });
   }
-
   updateCurrentIncomeValues(e) {
     let currentIncomeSourceCopy = Object.assign({}, this.state.currentIncomeSource);
-    let id = e.target.id.replace('income-', '');
-    if(id === 'amount') {
-      currentIncomeSourceCopy[id] = e.target.value.replace(/-/g, '');
+    let prop = e.target.id.replace('income-', '');
+    if(prop === 'amount') {
+      currentIncomeSourceCopy[prop] = e.target.value.replace(/-/g, '');
     } else {
-      currentIncomeSourceCopy[id] = e.target.value;
+      currentIncomeSourceCopy[prop] = e.target.value;
     }
     // IF THE FREQUENCY TYPE IS BEING CHANGE, RESET THE FREQUENCY DAYS
-    if(id === 'frequencyType') {
+    if(prop === 'frequencyType') {
       currentIncomeSourceCopy.frequencyDays = []
     }
 
     this.setState({ currentIncomeSource: currentIncomeSourceCopy });
+  }
+  updateCurrentBalanceValues(e) {
+    let balanceInfo = { ...this.state.balanceInfo };
+    let prop = e.target.id.replace('balance-', '');
+    let val = prop === 'amount' ? currency(e.target.value).value : new Date(e.target.value);
+    balanceInfo[prop] = e.target.value;
+    this.setState({ balanceInfo });
   }
 
   // WHEN SELECTING A BILL FROM THE BILLS LIST
@@ -470,6 +492,20 @@ export default class CreateBudgetView extends Component {
         <div className='create-budget-title'>
           <h1>Create A New Budget</h1>
         </div>
+        <div className='balance-entry-container entry-container'>
+          <h2>Starting Balance</h2>
+          <div>
+            <label>Amount</label>
+            <input id='balance-amount' type='number' className='create-balance-field' value={this.state.balanceInfo.amount} onChange={ e => this.updateCurrentBalanceValues(e)}></input>
+          </div>
+          <div>
+            <label>Start Date</label>
+            <input id='balance-date' type='date' className='create-balance-field' value={this.state.balanceInfo.date} onChange={ e => this.updateCurrentBalanceValues(e)}></input>
+          </div>
+        </div>
+
+        <hr/>
+        
         <div className='income-entry-container entry-container'>
           <h2>Income</h2>
           <div>

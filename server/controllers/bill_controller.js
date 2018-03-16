@@ -6,7 +6,6 @@ module.exports = {
     if(req.body.bills) {
       const db = req.app.get('db');
       const bills = req.body.bills;
-      console.log('bills: ', bills);
       // DELETE ALL OF THE BILLS FIRST. WHEN BILLS ARE EDITED, THEY ARE ALL SENT BACK, SO IF THE USER DIDN'T DELETE THEM
       // THEY WILL ALL BE ADDED BACK WITH ANY CHANGES MADE
       db.delete_all_user_bills(user_id).then( response => {

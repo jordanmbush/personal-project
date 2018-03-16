@@ -6,7 +6,6 @@ hr {
 button {
   border: none;
   margin: 1px;
-  font-size: 20px;
 }
 button:hover {
   cursor: pointer;
@@ -45,7 +44,8 @@ small {
 }
 
 .header {
-  width: 100%;
+  width: 90%;
+  margin: auto;
 }
 
 .header > * {
@@ -54,34 +54,40 @@ small {
 
 .header div h1 {
   font-family: 'Lobster', cursive;
-  font-size: 40px;
-  letter-spacing: 5px;
+  font-size: 35px;
+  letter-spacing: 4px;
   font-weight: bold;
   color: #2AD705;
   text-shadow: 4px 4px #0973B3;
 }
 .header div {
-  margin-left: 20px;
+  margin-left: 5px;
 }
-.header button {
-  font-size: 15px;
-  background-color: #0973B3;
-  margin: 5px;
+.header button:hover {
+  transform: scale(1.02);
 }
 .logout-button > * {
-  color: white;
+  color: #0973B3;
   font-size: 33px;
   font-weight: bold;
 }
 .logout-button {
   float: right;
+  border-radius: 5px;
+  background-color: white;
+  border: #0973B3 2px solid;
 }
 .dashboard-button {
   color: white;
   font-weight: bold;
   font-size: 30px !important;
+  border-radius: 5px;
+  background-color: #0973B3;
 }
-
+.header button {
+  font-size: 15px;
+  margin-top: 10px;
+}
 /* 
 =================================================================
 ====================== LOGIN COMPONENT ==========================
@@ -145,7 +151,7 @@ small {
   flex-direction: column;
   height: 160px;
   text-align: center;
-  background-color: rgba(128, 128, 128, 0.322);
+  background-color: rgba(223, 223, 223, 0.322);
   border-radius: 5px;
   width: 200px;
   position: absolute;
@@ -156,7 +162,20 @@ small {
   transform: scale(1.30);
   z-index: 1;
 }
-
+.login-blur-box {
+  height: 200px;
+  border-radius: 2px;
+  width: 250px;
+  position: absolute;
+  top: 28vh;
+  left: 50%;
+  margin-left: -125px;
+  filter: blur(2px);
+  background-image: url('./assets/add_transaction_background_img_sm.jpg');
+  background-repeat: repeat;
+  background-position: center;
+  background-attachment: fixed;
+}
 .login-button-container button {
   height: 40px;
   width: 70%;
@@ -177,20 +196,6 @@ small {
   font-weight: bold;
   text-align: left;
   margin: 10px 0 0 10px;
-}
-.login-blur-box {
-  height: 200px;
-  border-radius: 2px;
-  width: 250px;
-  position: absolute;
-  top: 29vh;
-  left: 50%;
-  margin-left: -125px;
-  filter: blur(3px);
-  background-image: url('./assets/add_transaction_background_img_sm.jpg');
-  background-repeat: repeat;
-  background-position: center;
-  background-attachment: fixed;
 }
 
 .panel {
@@ -271,6 +276,7 @@ small {
   display: flex;
   justify-content: space-between;
   width: 100%;
+  margin: 10px 0;
 }
 
 .month-navigation-buttons-container button {
@@ -281,7 +287,10 @@ small {
   background-color: #0973B3;
   border-radius: 10px;
 }
-
+.month-navigation-buttons-container button:hover {
+  background-color: rgba(9, 114, 179, 0.726);
+  transform: scale(.95);
+}
 .month-navigation-buttons-container span {
   display: none;
 }
@@ -512,20 +521,80 @@ small {
 
 /* 
 =================================================================
-====================== CREATE BUDGET COMPONENT ==================
+====================== DASHBOARD COMPONENT ==================
 =================================================================
  */
 .dashboard-component {
   min-height: 100vh;
 }
-
+.nav-buttons-container {
+  display: flex;
+  justify-content: space-between;
+  margin: auto;
+}
 .chart-container {
   background-color: white;
   width: 90%;
   margin: 20px auto;
   border-radius: 10px;
   border: 3px solid #0973B3;
+}
 
+.current-financial-summary {
+  border: 1px solid black;
+  display: flex;
+  flex-direction: column;
+  width: 90%;
+  margin: auto;
+  border: 3px solid #0973B3;
+  border-radius: 10px;
+  background-color: white;
+}
+.current-financial-summary > * {
+  margin: 5px;
+  font-size: 15px;
+  font-weight: bold;
+}
+.upcoming-bills-container {
+  display: flex;
+  flex-direction: column;
+}
+.current-financial-summary label {
+  text-decoration-line: underline;
+}  
+.upcoming-bills-container > .row {
+  display: flex;
+  flex-direction: row;
+  margin: 3px;
+}
+.upcoming-bills-header {
+  display: flex;
+}
+.upcoming-bills-header > div {
+  flex: 1;
+  font-size: 15px;
+  color: #0973B3;
+  font-style: oblique;
+  margin: 2px;
+}
+.upcoming-bills-container > .even-row > * {
+  background-color: rgba(202, 235, 242, 0.842);
+}
+
+.upcoming-bills-container > .row > div {
+  margin: 0 2px;
+}
+.upcoming-bills-container > .row > .name {
+  flex: 1;
+  overflow: hidden;
+}
+.upcoming-bills-container > .row > .amount {
+  flex: 1;
+  overflow: hidden;
+}
+.upcoming-bills-container > .row > .date {
+  flex: 1;
+  overflow: hidden;
 }
 /* 
 =================================================================
@@ -682,6 +751,25 @@ small {
   .entry-container {
     width: 70%;
   }
+  .header {
+    width: 90%;
+    margin: auto;
+  }
+  .header div h1 {
+    font-size: 50px;
+  }
+  .header div {
+    margin-left: 20px;
+  }
+  .header button {
+    font-size: 20px;
+  }
+  .logout-button > * {
+    font-size: 40px;
+  }
+  .dashboard-button {
+    font-size: 40px !important;
+  }
 }
 
 @media (min-width: 1000px) {
@@ -703,5 +791,30 @@ small {
   }
   .entry-container {
     width: 50%;
+  }
+  .header {
+    width: 90%;
+    margin: auto;
+  }
+  .header div h1 {
+    font-size: 50px;
+  }
+  .header div {
+    margin-left: 60px;
+  }
+  .header button {
+    font-size: 20px;
+  }
+  .logout-button {
+    width: 100px;
+    border-radius: 5px;
+  }
+  .logout-button > * {
+    font-size: 40px;
+  }
+  .dashboard-button {
+    font-size: 40px !important;
+    width: 100px;
+    border-radius: 5px;
   }
 }

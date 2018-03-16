@@ -48,15 +48,16 @@ app.post('/api/transaction', checkSession, transaction_controller.addTransaction
 app.put('/api/transaction', checkSession, transaction_controller.updateTransaction);
 app.delete('/api/transaction/:id', checkSession, transaction_controller.deleteTransaction);
 
+app.post('/api/balance', checkSession, balance_controller.addBalance);
 app.get('/api/balance', checkSession, balance_controller.getBalance);
 
 app.post('/api/logout', checkSession, user_controller.logout);
 
 // ==============================================================
-const path = require('path')
-app.get('*', (req, res)=>{
-  res.sendFile(path.join(__dirname, '../build/index.html'));
-})
+// const path = require('path')
+// app.get('*', (req, res)=>{
+//   res.sendFile(path.join(__dirname, '../build/index.html'));
+// })
 
 const PORT = 4000;
 app.listen( PORT, console.log(`Listening on port ${PORT}.`));

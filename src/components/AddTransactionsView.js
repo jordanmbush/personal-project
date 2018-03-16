@@ -3,6 +3,9 @@ import axios from 'axios';
 import DateFunctions from './../helpers/DateFunctions';
 import Header from './Header';
 import currency from 'currency.js';
+import { getTransactionsFromDB, getEOWTransactionsFromTemplate, getMonthlyTransactionsFromTemplate, getTemplateTransactions, getWeeklyTransactionsFromTemplate, getXDAYSTransactionsFromTemplate, initializeTransactions } from '../helpers/DataFunctions';
+import categories from '../helpers/categories';
+import _ from 'lodash';
 
 const DAY = 'DAY';
 const WEEK = 'WEEK';
@@ -55,10 +58,16 @@ export default class AddTransactionsView extends Component {
     this.saveTransaction = this.saveTransaction.bind(this);
     this.deleteTransaction = this.deleteTransaction.bind(this);
     this.updateTransactionValues = this.updateTransactionValues.bind(this);
+    // ===========================================
+    this.getTrans = getTransactionsFromDB.bind(this);
+    this.putTransactionsInState = initializeTransactions.bind(this);
+    this.getTemplateTrans = getTemplateTransactions.bind(this);
+    this.getCategories = this.getCategories.bind(this);
+    this.getSubCategories = this.getSubCategories.bind(this);
   }
 
   componentDidMount() {
-    this.getTransactionsFromDB();
+    this.getTrans();
   }
 
   getTransactionsFromDB() {
@@ -87,7 +96,7 @@ export default class AddTransactionsView extends Component {
                 incomeSources: parsedIncome,
                 transactions: parsedTransactions,
                 balanceInfo: balanceInfo.data,
-              }, () => this.initializeTransactions())
+              }, () => this.putTransactionsInState())
             }).catch( err => console.log('addtransactionsview - get income err: ', err));
           }).catch( err => console.log('addtransactionsview - get bills err: ', err));
         }).catch( err => console.log('addtransactionsview - get transactions err: ', err));
@@ -98,6 +107,27 @@ export default class AddTransactionsView extends Component {
     })
   }
 
+  getCategories() {
+    let categoriesJSX = _.keys(categories);
+    categoriesJSX = categoriesJSX.map( key => {
+      return (
+        <option>{key}</option>
+      )
+    })
+    return categoriesJSX;
+  }
+  getSubCategories() {
+    let subCategories = categories[this.state.category];
+    let subCategoriesJSX = []
+    if(subCategories) {
+      subCategoriesJSX = subCategories.map( subCat => {
+        return (
+          <option>{subCat}</option>
+        )
+      })
+    }
+    return subCategoriesJSX;
+  }
   // =============================== CHANGE MONTH BUTTONS ===============================
   nextMonth() {
     let month = this.state.selectedMonth;
@@ -112,7 +142,7 @@ export default class AddTransactionsView extends Component {
     this.setState({
       selectedMonth: month,
       selectedYear: year,
-    }, () => this.initializeTransactions());
+    }, () => this.putTransactionsInState());
   }
 
   currentMonth() {
@@ -122,7 +152,7 @@ export default class AddTransactionsView extends Component {
     this.setState({
       selectedMonth: month,
       selectedYear: year,
-    }, () => this.initializeTransactions());
+    }, () => this.putTransactionsInState());
   }
 
   previousMonth() {
@@ -136,7 +166,7 @@ export default class AddTransactionsView extends Component {
     this.setState({
       selectedMonth: month,
       selectedYear: year,
-    }, () => this.initializeTransactions());
+    }, () => this.putTransactionsInState());
   }
   // =======================================================================================
   
@@ -435,6 +465,14 @@ export default class AddTransactionsView extends Component {
               <input id={dayID + '-entry-amount'}    placeholder='amount' type='number'></input>
               <input id={dayID + '-entry-category'}  placeholder='category'></input>
               <input id={dayID + '-entry-subCategory'}  placeholder='subcategory'></input>
+              <select id='category' className='create-budget-field category category-select' value={this.state.category} onChange={ e => this.eventHandler(e)}>
+                <option selected> -- select an option -- </option>
+                {this.getCategories()}
+              </select>
+              <select id='subCategory' className='create-budget-field category sub-category-select' value={this.state.subCategory} onChange={ e => this.eventHandler(e)}>
+                  <option selected> -- select an option -- </option>
+                  {this.getSubCategories()}
+              </select>
               <div className='income-radio radio-container'>
                 <label htmlFor={dayID + '-radio-income'}>Income</label>
                 <input id={dayID + '-radio-income'}  type='radio' name={`${dayID}-transaction-type`}></input>
@@ -675,9 +713,9 @@ export default class AddTransactionsView extends Component {
         <div className='transaction-table-container'>
           <div className='transaction-table-header-container'>
             <div className='transaction-table-header'>
+              <div className='transaction-table-date-column'><span>Date</span></div>
               <div className='transaction-table-week-day-column'><span>Day</span></div>
               <div className='transaction-table-balance-column'><span>Balance</span></div>
-              <div className='transaction-table-date-column'><span>Date</span></div>
               <div className='transaction-table-name-column'><span>Name</span></div>
               <div className='transaction-table-amount-column'><span>Amount</span></div>
             </div>

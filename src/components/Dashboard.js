@@ -7,8 +7,16 @@ import {Bar, Line, Pie} from 'react-chartjs-2';
 import { getTransactionsFromDB, getEOWTransactionsFromTemplate, getMonthlyTransactionsFromTemplate, getTemplateTransactions, getWeeklyTransactionsFromTemplate, getXDAYSTransactionsFromTemplate, initializeTransactions } from '../helpers/DataFunctions';
 import categories from '../helpers/categories';
 import _ from 'lodash';
+import DateFunctions from '../helpers/DateFunctions';
 
 const monthNames =  ["January", "February", "March", "April", "May", "June", "July", "August", "September", "October", "November", "December"];
+Date.prototype.isSameDateAs = function(pDate) {
+  return (
+    this.getFullYear() === pDate.getFullYear() &&
+    this.getMonth() === pDate.getMonth() &&
+    this.getDate() === pDate.getDate()
+  );
+}
 
 export default class Dashboard extends Component {
   constructor() {
@@ -30,7 +38,8 @@ export default class Dashboard extends Component {
           data: [0, 10, 5, 2, 20, 30, 45],
           },
         ]
-      }
+      },
+      numNextBills: 5
     }
 
     this.getTrans = getTransactionsFromDB.bind(this);
@@ -40,6 +49,7 @@ export default class Dashboard extends Component {
     this.getSubCategories = this.getSubCategories.bind(this);
     this.eventHandler = this.eventHandler.bind(this);
     this.getChartData = this.getChartData.bind(this);
+    this.showNextXBills = this.showNextXBills.bind(this);
   }
   
   componentDidMount() {
@@ -68,16 +78,17 @@ export default class Dashboard extends Component {
         let monthData = fullTransactionSet.filter( transaction => {
           return transaction.day.getMonth() === i;
         })
+        
+        let incomeAmt = 0;
+        let expenseAmt = 0;
         if(monthData.length) {
-          let incomeAmt = 0;
-          let expenseAmt = 0;
           let monthTotal = monthData.map( transaction => {
             transaction.transactionType === 'income' ? incomeAmt += Math.abs(transaction.amount) : expenseAmt += Math.abs(transaction.amount);
             return transaction;
           })
-          incomeData.push(incomeAmt);
-          expenseData.push(expenseAmt);
         }
+        incomeData.push(currency(incomeAmt).value);
+        expenseData.push(currency(expenseAmt).value);
       }
     }
     let chartData = {
@@ -129,14 +140,82 @@ export default class Dashboard extends Component {
     return subCategoriesJSX;
   }
 
+  getTodaysBalance() {
+    let balance = null;
+    let today = new Date();
+    if(this.state.fullTransactionSet) {
+      // I REVERSE THE ARRAY SINCE findIndex WILL FIND THE FIRST TRANSACTION FOR THE DAY THAT IT IS LOOKING FOR.
+      // SINCE TRANSACTIONS ARE LISTED CHRONOLOGICALLY, EVEN WITHIN DAYS, REVERSING WILL MAKE THE FIRST DAY THAT
+      // IS FOUND BE THE LAST TRANSACTION FOR THAT DAY, AND THEREFORE THE ENDING BALANCE FOR THAT DAY.
+      let reversedTransactionSet = this.state.fullTransactionSet.slice().reverse();
+      let index = reversedTransactionSet.findIndex(transaction => transaction.day <= today);
+      if(index !== -1) {
+        if(reversedTransactionSet[index].day.isSameDateAs(today)){
+          balance = reversedTransactionSet[index].balance;
+        } else {
+          balance = reversedTransactionSet[index - 1].balance;
+        }
+      }
+      balance = balance ? balance : this.state.balanceInfo.amount;
+    }
+    return balance;
+  }
+  showNextXBills() {
+    let x = this.state.numNextBills;
+    let today = new Date();
+    today = new Date(today.getFullYear(), today.getMonth(), today.getDate()); //GET TODAY WITH NO TIME
+    let bills = [];
+    if(this.state.fullTransactionSet) {
+      let fullTransactionSet = this.state.fullTransactionSet.slice();
+      fullTransactionSet = fullTransactionSet.filter(transaction => {
+        return(
+          transaction.transactionType === 'expense' &&
+          transaction.day >= today
+        )
+      })
+      bills = fullTransactionSet.splice(0, x);
+      bills = bills.map( (transaction, i) => {
+        return (
+          <div className={`row ${i % 2 === 0 ? 'even-row' : 'odd-row'}`}>
+            <div className='name' >-{transaction.name}</div>
+            <div className='amount' >{currency(transaction.amount).format(true)}</div>
+            <div className='date' >{DateFunctions.simpleDateFormat(transaction.day)}</div>
+          </div>
+        )
+      })
+    }
+    return bills
+  }
   render() {
     return (
       <div className='dashboard-component'>
         <Header />
-        Dashboard Component!!
-        <Link to='/create-budget'><button>Create a new Budget</button></Link>
-        <Link to='/add-transactions'><button>Add / Edit Transactions</button></Link>
-        <div className=''>
+        <div className='nav-buttons-container'>
+          <Link to='/create-budget'><button className='edit-budget-button'>Edit My Budget</button></Link>
+          <Link to='/add-transactions'><button className='add-transactions-button'>Add / Edit Transactions</button></Link>
+        </div>
+        <div className='current-financial-summary' >
+          <div className='balance-container'>
+            <label htmlFor='balance' >Today's Balance: </label>
+            <span id='balance' className='balance'>{currency(this.getTodaysBalance()).format(true)}</span>
+          </div>
+          <div className='upcoming-bills-container'>
+            <label className='upcoming-bill-title'>Upcoming Bills...</label>
+            <div className='upcoming-bills-header'>
+              <div className='name' >Name</div>
+              <div className='amount' >Amount</div>
+              <div className='date' >Date</div>
+            </div>
+            {this.showNextXBills()}
+          </div>
+          <div className='financial-status-container'>
+            <label htmlFor='status' >Your Status: </label>
+            <span id='status' className='status'>{currency(this.getTodaysBalance()).format(true)}</span>
+          </div>
+          <div className='balance'></div>
+          <div className='balance'></div>
+        </div>
+        <div className='chart-criteria-container'>
           <select onChange={ e => this.setSelectedMonth(e)} className='chart-month'>
             <option value={0}>January</option>
             <option value={1}>February</option>
@@ -168,7 +247,7 @@ export default class Dashboard extends Component {
             width={90}
             data={this.getChartData()}
             options={{
-              maintainAspectRatio: false
+              maintainAspectRatio: false,
             }}
           />
         </div>
