@@ -141,7 +141,7 @@ export default class Dashboard extends Component {
   }
 
   getTodaysBalance() {
-    let balance = 'Loading...';
+    let balance = null;
     let today = new Date();
     if(this.state.fullTransactionSet) {
       // I REVERSE THE ARRAY SINCE findIndex WILL FIND THE FIRST TRANSACTION FOR THE DAY THAT IT IS LOOKING FOR.
@@ -154,6 +154,7 @@ export default class Dashboard extends Component {
           balance = reversedTransactionSet[index].balance;
         } else {
           balance = currency(reversedTransactionSet[index - 1].balance).format(true);
+          // balance = currency(0).format(true);
         }
       }
       balance = balance ? balance : this.state.balanceInfo.amount;
@@ -258,13 +259,12 @@ export default class Dashboard extends Component {
             <option selected={this.state.selectedMonth === 11} value={11}>December</option>
           </select>
           <div>
-            <label>Filter:</label>
             <select id='category' className='create-budget-field category category-select' value={this.state.category} onChange={ e => this.eventHandler(e)}>
-              <option selected> -- select a category -- </option>
+              <option selected> -- filter by category -- </option>
               {this.getCategories()}
             </select>
             <select id='subCategory' className='create-budget-field category sub-category-select' value={this.state.subCategory} onChange={ e => this.eventHandler(e)}>
-              <option selected> -- select subcategory -- </option>
+              <option selected> -- filter by subcategory -- </option>
               {this.getSubCategories()}
             </select>
           </div>

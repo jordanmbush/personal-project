@@ -238,11 +238,11 @@ export default class AddTransactionsView extends Component {
       let dayID = DateFunctions.formatDate(day);
       const subTransactionHeader = (
         <div className='transaction-table-row-header'>
-          <div className='sub-transaction-header-title'>Balance</div>
+          <div className='sub-transaction-header-title'>Bal</div>
           <div className='sub-transaction-header-title'>Name</div>
-          <div className='sub-transaction-header-title'>Amount</div>
-          <div className='sub-transaction-header-title'>Category</div>
-          <div className='sub-transaction-header-title'>Sub-Cat.</div>
+          <div className='sub-transaction-header-title'>Amt</div>
+          <div className='sub-transaction-header-title'>Ctg</div>
+          <div className='sub-transaction-header-title'>SubCtg</div>
         </div>
       );
       // ==========================================================================
@@ -323,26 +323,37 @@ export default class AddTransactionsView extends Component {
           <div className='transaction-row-content-container row-hidden' id={`${dayID}-content-container`}>
             {subTransactionHeader}
             {dailyTransactions}
-            <div className='transaction-table-entry-row' id={dayID + '-entry-row'}>
-              <input id={dayID + '-entry-name'}      value={this.getNewTransaction(`${dayID}`) && this.getNewTransaction(`${dayID}`).name || ''} placeholder="name - e.g. 'Water'" onChange={e => this.setNewTransactionValue(e.target)}></input>
-              <input id={dayID + '-entry-amount'}    value={this.getNewTransaction(`${dayID}`) && this.getNewTransaction(`${dayID}`).amount || ''} placeholder='amount' type='number' onChange={e => this.setNewTransactionValue(e.target)}></input>
-              <select id={dayID + '-entry-category'} value={this.getNewTransaction(`${dayID}`) && this.getNewTransaction(`${dayID}`).category || ''} onChange={e => this.setNewTransactionValue(e.target)}>
-                <option selected> --category-- </option>
-                {this.getCategories()}
-                </select>
-              <select id={dayID + '-entry-subCategory'} value={this.getNewTransaction(`${dayID}`) && this.getNewTransaction(`${dayID}`).subCategory} onChange={e => this.setNewTransactionValue(e.target)}>
-                <option selected> --subcategory-- </option>
-                {this.getSubCategories(this.getNewTransaction(`${dayID}`) && this.getNewTransaction(`${dayID}`).category)}
-              </select>
-              <div className='income-radio radio-container'>
-                <label htmlFor={dayID + '-radio-income'}>Income</label>
-                <input id={dayID + '-radio-income'}  type='radio' name={`${dayID}-transaction-type`} checked={this.getNewTransaction(`${dayID}`) && this.getNewTransaction(`${dayID}`).transactionType === 'income'} onChange={e => this.setNewTransactionValue(e.target)}></input>
+            <div className='show-entry-fields-button-container'>
+              <button id={dayID + '-toggle-entry-row-button'} className='show-fields' onClick={() => this.toggleEntryRowVisibility(dayID)}>+ Add Transactions</button>
+            </div>
+            <div className='transaction-table-entry-container row-hidden' id={dayID + '-entry-row'}>
+              <div className='data-fields entry-row'>
+                <div className='entry-field'><input id={dayID + '-entry-name'}      value={this.getNewTransaction(`${dayID}`) && this.getNewTransaction(`${dayID}`).name || ''} placeholder="name - e.g. 'Water'" onChange={e => this.setNewTransactionValue(e.target)}></input></div>
+                <div className='entry-field'><input id={dayID + '-entry-amount'}    value={this.getNewTransaction(`${dayID}`) && this.getNewTransaction(`${dayID}`).amount || ''} placeholder='amount' type='number' onChange={e => this.setNewTransactionValue(e.target)}></input></div>
+                <div className='entry-field'>
+                  <select id={dayID + '-entry-category'} value={this.getNewTransaction(`${dayID}`) && this.getNewTransaction(`${dayID}`).category || ''} onChange={e => this.setNewTransactionValue(e.target)}>
+                    <option selected> --category-- </option>
+                    {this.getCategories()}
+                  </select>
+                </div>
+                <div className='entry-field'>
+                  <select id={dayID + '-entry-subCategory'} value={this.getNewTransaction(`${dayID}`) && this.getNewTransaction(`${dayID}`).subCategory} onChange={e => this.setNewTransactionValue(e.target)}>
+                    <option selected> --subcategory-- </option>
+                    {this.getSubCategories(this.getNewTransaction(`${dayID}`) && this.getNewTransaction(`${dayID}`).category)}
+                  </select>
+                </div>
               </div>
-              <div className='expense-radio radio-container'>
-                <label htmlFor={dayID + '-radio-expense'}>Expense</label>
-                <input id={dayID + '-radio-expense'} type='radio' name={`${dayID}-transaction-type`} checked={this.getNewTransaction(`${dayID}`) && this.getNewTransaction(`${dayID}`).transactionType === 'expense'} onChange={e => this.setNewTransactionValue(e.target)}></input>
+              <div className='transaction-buttons-container button-fields entry-row'>
+                <div className='income-radio radio-container entry-field'>
+                  <label htmlFor={dayID + '-radio-income'}>Income</label>
+                  <input id={dayID + '-radio-income'}  type='radio' name={`${dayID}-transaction-type`} checked={this.getNewTransaction(`${dayID}`) && this.getNewTransaction(`${dayID}`).transactionType === 'income'} onChange={e => this.setNewTransactionValue(e.target)}></input>
+                </div>
+                <div className='expense-radio radio-container entry-field'>
+                  <label htmlFor={dayID + '-radio-expense'}>Expense</label>
+                  <input id={dayID + '-radio-expense'} type='radio' name={`${dayID}-transaction-type`} checked={this.getNewTransaction(`${dayID}`) && this.getNewTransaction(`${dayID}`).transactionType === 'expense'} onChange={e => this.setNewTransactionValue(e.target)}></input>
+                </div>
+                <button className='entry-field' id={dayID + '-add-button'} onClick={e => this.addTransaction(e.target)} >Add</button>
               </div>
-              <button id={dayID + '-add-button'} onClick={e => this.addTransaction(e.target)} >Add</button>
             </div>
           </div>
         </div>
@@ -547,6 +558,27 @@ export default class AddTransactionsView extends Component {
     } else if(contentContainerClassList.indexOf('row-hidden') !== -1) {
       contentContainerClassList.splice(contentContainerClassList.indexOf('row-hidden'), 1, 'row-showing');
       contentContainer.className = contentContainerClassList.join(' ');
+    }
+  }
+
+  toggleEntryRowVisibility(dayID) {
+    let entryRow = document.getElementById(dayID + '-entry-row');
+    let toggleButton = document.getElementById(dayID + '-toggle-entry-row-button');
+
+    let entryRowClassList = entryRow.className.split(' ');
+
+    let index = entryRowClassList.indexOf('row-hidden');
+    
+    if(index !== -1) {
+      entryRowClassList.splice(entryRowClassList.indexOf('row-hidden'),1)
+      entryRow.className = entryRowClassList.join(' ');
+      toggleButton.innerText = 'Cancel';
+      toggleButton.className = 'hide-fields'
+    } else {
+      entryRowClassList.push('row-hidden');
+      entryRow.className = entryRowClassList.join(' ');
+      toggleButton.innerText = '+ Add Transaction';
+      toggleButton.className = 'show-fields'
     }
   }
   

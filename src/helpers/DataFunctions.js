@@ -165,10 +165,10 @@ export function initializeTransactions(transactionsInput = []) {
       lastDayOfCurrentMonth = new Date(year, month + 1, 0);
       for(let day = new Date(year, month, 1); day <= lastDayOfCurrentMonth; day.setDate(day.getDate() + 1)) {
         for(let j = 0; j < transactions.length; j ++) {
-          const { name, amount, date, type, category, subCategory, id } = transactions[j];
+          const { name, amount, date, type, category, sub_category, id } = transactions[j];
           if(new Date(date).isSameDateAs(day)) {
             balanceAmount = currency(balanceAmount).add(amount).value;
-            formattedTransactions.push({ id, transactionType: type, balance: balanceAmount, name, amount: currency(amount).value, category, subCategory, day: new Date(date)  });
+            formattedTransactions.push({ id, transactionType: type, balance: balanceAmount, name, amount: currency(amount).value, category, subCategory: sub_category, day: new Date(date)  });
           }
         }
       }

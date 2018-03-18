@@ -164,7 +164,7 @@ small {
   top: 30vh;
   left: 50%;
   margin-left: -100px;
-  box-shadow: 5px 7px 15px 0px rgba(0,0,0,0.25);
+  box-shadow: -10px 10px 15px 5px rgba(0,0,0,0.25);
   transform: scale(1.30);
   z-index: 1;
 }
@@ -235,21 +235,16 @@ small {
   flex-wrap: wrap;
   width: 90%;
 }
-
 .panel-main-info > * {
   margin: 10px 10px 10px 0;
 }
-.panel-content{
-
-}
- 
 #panel-1 {
   background-color: rgba(13, 166, 255, 0.8);
   color: white;
 }
 #panel-1 h2 { text-shadow: 2px 2px black; }
 #panel-2 h2 { text-shadow: 2px 2px white; }
-#panel-3 h2 { text-shadow: 2px 2px black; }
+#panel-3 h2 { text-shadow: 2px 2px white; }
 #panel-4 h2 { text-shadow: 2px 2px white; }
 
 #panel-2 {
@@ -257,7 +252,6 @@ small {
 }
 #panel-3 {
   background-color: rgba(255, 242, 0, 0.8);
-  color: white;
 }
 #panel-4 {
   background-color: rgba(13, 166, 255, 0.8);
@@ -369,6 +363,18 @@ small {
   text-align: center;
   margin: 5px;
 }
+
+.transaction-table-row-header {
+  display: flex;
+  font-size: 15px;
+  justify-content: space-around;
+  padding: 5px 0;
+  width: 100%;
+  font-weight: bold;
+  text-decoration-line: underline;
+  border-radius: 5px;
+  border: 2px solid #0973B3;
+}
 .transaction-info {
   display: flex;
   justify-content: space-between;
@@ -376,7 +382,7 @@ small {
 }
 .transaction-info > div {
   padding: 2.5px;
-  flex: 1;
+  width: 100%;
   font-size: 15px;
   font-weight: bold;
   overflow: hidden;
@@ -391,44 +397,57 @@ small {
   box-sizing: border-box;
 }
 
-.transaction-buttons-container {
-  height: 40px;
-}
-
 .transaction-buttons-container > * {
   font-size: 15px;
+  flex: 1;
+  display: flex;
+  align-items: center;
+  text-align: center;
+  border-radius: 5px;
+  justify-content: center;
+  font-weight: bold;
 }
-
+.transaction-buttons-container > * > * {
+  flex: 1;
+  display: flex;
+  align-items: center;
+  justify-content: space-around;
+}
+.transaction-buttons-container label {
+  display: flex;
+}
 .fa-money-bill-alt {
   font-size: 25px;
 }
 
-.transaction-table-row-header {
+.transaction-table-entry-container {
+  display: flex;
+  flex-direction: column;
+  background-color: white;
+  border: 3px outset #0DA5FF;
+  border-radius: 10px;
+}
+.transaction-table-entry-container > .entry-row {
   display: flex;
   font-size: 15px;
   justify-content: space-between;
+  margin: 5px;
+}
+.transaction-table-entry-container > .entry-row > .entry-field {
+  margin: 2px;
+  flex: 1;
+}
+.transaction-table-entry-container > .entry-row > .entry-field > * {
   width: 100%;
-  padding: 5px;
-  font-weight: bold;
-  text-decoration-line: underline;
-  background-color: rgb(175, 229, 241);
-  border-radius: 5px;
-  border: 2px solid #0973B3;
 }
 
-.transaction-table-entry-row {
-  display: flex;
-}
-
-.transaction-table-entry-row > * {
-  width: 50px;
-  font-size: 15px;
-}
-
-.transaction-table-entry-row input {
+.transaction-table-entry-container input, .transaction-table-entry-container select {
   border: 1px solid grey;
   border-radius: 5px;
   padding: 5px;
+  line-height: 17px;
+  color: grey;
+  box-sizing: border-box;
 }
 
 .banded-true {
@@ -477,6 +496,25 @@ small {
   margin-top: auto;
   margin-bottom: auto;
 }
+.show-entry-fields-button-container {
+  display: flex;
+  justify-content: center;
+}
+.show-entry-fields-button-container > button {
+  flex: 1;
+  padding: 10px;
+  border-radius: 10px;
+  background-color: #2AD705;
+  color: white;
+  font-weight: bold;
+  letter-spacing: 3px;
+}
+.show-entry-fields-button-container > .hide-fields {
+  background-color: white;
+  border: 2px solid red;
+  color: red;
+  padding: 3px;
+}
 
 .row-hidden {
   display: none;
@@ -488,17 +526,26 @@ small {
 }
 
 .radio-container {
-  padding: 5px;
   border-radius: 5px;
+  border: 2px solid;
+  background-color: white;
+  font-weight: bold;
+  display: flex;
+  justify-content: space-around;
+  padding: 2px;
+  align-items: center;
+  text-align: center;
+  line-height: 20px;
 }
 .income-radio {
-  background-color: rgb(140, 214, 124);
+  border-color: #2AD705;
   font-size: 15px;
+  color: #2AD705;
 }
-
 .expense-radio {
-  background-color: #FF3B3F;
+  border-color: #0DA5FF;
   font-size: 15px;
+  color: #0DA5FF;
 }
 
 .transaction-table-daily-header-row {
@@ -637,11 +684,24 @@ small {
 }
 .chart-criteria-container {
   display: flex;
+  justify-content: space-between;
   width: 90%;
   margin: auto;
+  align-items: center;
 }
 .chart-criteria-container > * {
-  margin: 10px 10px 5px 10px;
+  margin: 10px 0;
+  flex: 1;
+}
+.chart-criteria-container > div {
+  flex: 2;
+  display: flex;
+  flex-wrap: wrap;
+  justify-content: flex-end;
+
+}
+.chart-criteria-container > div > * {
+  margin: 5px;
 }
 .chart-criteria-container select {
   border-radius: 5px;
