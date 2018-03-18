@@ -96,14 +96,14 @@ export default class Dashboard extends Component {
       datasets: [
         {
           label: 'Income',
-          backgroundColor: 'rgb(255, 99, 132)',
-          borderColor: 'rgb(255, 99, 132)',
+          backgroundColor: '#2AD705',
+          borderColor: '#2AD705',
           data: incomeData,
         },
         {
           label: 'Expenses',
-          backgroundColor: 'rgb(10, 99, 132)',
-          borderColor: 'rgb(10, 99, 132)',
+          backgroundColor: '#FFF400',
+          borderColor: '#FFF400',
           data: expenseData,
         }
       ]
@@ -141,7 +141,7 @@ export default class Dashboard extends Component {
   }
 
   getTodaysBalance() {
-    let balance = null;
+    let balance = 'Loading...';
     let today = new Date();
     if(this.state.fullTransactionSet) {
       // I REVERSE THE ARRAY SINCE findIndex WILL FIND THE FIRST TRANSACTION FOR THE DAY THAT IT IS LOOKING FOR.
@@ -153,7 +153,7 @@ export default class Dashboard extends Component {
         if(reversedTransactionSet[index].day.isSameDateAs(today)){
           balance = reversedTransactionSet[index].balance;
         } else {
-          balance = reversedTransactionSet[index - 1].balance;
+          balance = currency(reversedTransactionSet[index - 1].balance).format(true);
         }
       }
       balance = balance ? balance : this.state.balanceInfo.amount;
@@ -186,7 +186,34 @@ export default class Dashboard extends Component {
     }
     return bills
   }
+
+  getBudgetStatus() {
+    let today = new Date();
+    let status = 'Good';
+    today = new Date(today.getFullYear(), today.getMonth(), today.getDate()); //GET TODAY WITH NO TIME
+    let bills = [];
+    if(this.state.fullTransactionSet) {
+      let fullTransactionSet = this.state.fullTransactionSet.slice();
+      fullTransactionSet = fullTransactionSet.filter(transaction => {
+        return(
+          transaction.transactionType === 'expense' &&
+          transaction.day >= today
+        )
+      })
+      for(let i = 0; i < fullTransactionSet.length; i++) {
+        if(fullTransactionSet[i].balance < 0){
+          status = 'Bad'
+          break;
+        } 
+      }
+    }
+
+    return status;
+  }
+  
   render() {
+    let budgetStatus = this.getBudgetStatus();
+    let currentBalance = currency(this.getTodaysBalance()).format(true);
     return (
       <div className='dashboard-component'>
         <Header />
@@ -197,7 +224,7 @@ export default class Dashboard extends Component {
         <div className='current-financial-summary' >
           <div className='balance-container'>
             <label htmlFor='balance' >Today's Balance: </label>
-            <span id='balance' className='balance'>{currency(this.getTodaysBalance()).format(true)}</span>
+            <span id='balance' className='balance'>{currentBalance}</span>
           </div>
           <div className='upcoming-bills-container'>
             <label className='upcoming-bill-title'>Upcoming Bills...</label>
@@ -209,35 +236,35 @@ export default class Dashboard extends Component {
             {this.showNextXBills()}
           </div>
           <div className='financial-status-container'>
-            <label htmlFor='status' >Your Status: </label>
-            <span id='status' className='status'>{currency(this.getTodaysBalance()).format(true)}</span>
+            <label htmlFor='status' >Budget Status: </label>
+            <span id='status' className={`${budgetStatus === 'Bad' ? 'status-bad' : 'status-good'} status`}>{budgetStatus}</span>
           </div>
           <div className='balance'></div>
           <div className='balance'></div>
         </div>
         <div className='chart-criteria-container'>
           <select onChange={ e => this.setSelectedMonth(e)} className='chart-month'>
-            <option value={0}>January</option>
-            <option value={1}>February</option>
-            <option value={2}>March</option>
-            <option value={3}>April</option>
-            <option value={4}>May</option>
-            <option value={5}>June</option>
-            <option value={6}>July</option>
-            <option value={7}>August</option>
-            <option value={8}>Septempber</option>
-            <option value={9}>October</option>
-            <option value={10}>November</option>
-            <option value={11}>December</option>
+            <option selected={this.state.selectedMonth === 0} value={0}>January</option>
+            <option selected={this.state.selectedMonth === 1} value={1}>February</option>
+            <option selected={this.state.selectedMonth === 2} value={2}>March</option>
+            <option selected={this.state.selectedMonth === 3} value={3}>April</option>
+            <option selected={this.state.selectedMonth === 4} value={4}>May</option>
+            <option selected={this.state.selectedMonth === 5} value={5}>June</option>
+            <option selected={this.state.selectedMonth === 6} value={6}>July</option>
+            <option selected={this.state.selectedMonth === 7} value={7}>August</option>
+            <option selected={this.state.selectedMonth === 8} value={8}>Septempber</option>
+            <option selected={this.state.selectedMonth === 9} value={9}>October</option>
+            <option selected={this.state.selectedMonth === 10} value={10}>November</option>
+            <option selected={this.state.selectedMonth === 11} value={11}>December</option>
           </select>
           <div>
-            <label>Category</label>
+            <label>Filter:</label>
             <select id='category' className='create-budget-field category category-select' value={this.state.category} onChange={ e => this.eventHandler(e)}>
-              <option selected> -- select an option -- </option>
+              <option selected> -- select a category -- </option>
               {this.getCategories()}
             </select>
             <select id='subCategory' className='create-budget-field category sub-category-select' value={this.state.subCategory} onChange={ e => this.eventHandler(e)}>
-              <option selected> -- select an option -- </option>
+              <option selected> -- select subcategory -- </option>
               {this.getSubCategories()}
             </select>
           </div>

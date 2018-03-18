@@ -39,19 +39,13 @@ export default class AddTransactionsView extends Component {
         amount: '',
         day: '',
       },
-      currentMonthTransactions: []
+      currentMonthTransactions: [],
+      newTransactions: []
     }
-    this.getTransactionsFromDB = this.getTransactionsFromDB.bind(this);
     this.nextMonth = this.nextMonth.bind(this);
     this.currentMonth = this.currentMonth.bind(this);
     this.previousMonth = this.previousMonth.bind(this);
     this.populateTransactionsByMonth = this.populateTransactionsByMonth.bind(this);
-    this.getWeeklyTransactionsFromTemplate = this.getWeeklyTransactionsFromTemplate.bind(this);
-    this.getMonthlyTransactionsFromTemplate = this.getMonthlyTransactionsFromTemplate.bind(this);
-    this.getEOWTransactionsFromTemplate = this.getEOWTransactionsFromTemplate.bind(this);
-    this.getXDAYSTransactionsFromTemplate = this.getXDAYSTransactionsFromTemplate.bind(this);
-    this.getTemplateTransactions = this.getTemplateTransactions.bind(this);
-    this.initializeTransactions = this.initializeTransactions.bind(this);
     this.toggleTableRowVisibility = this.toggleTableRowVisibility.bind(this);
     this.toggleEditSaveTransactionButton = this.toggleEditSaveTransactionButton.bind(this);
     this.addTransaction = this.addTransaction.bind(this);
@@ -64,47 +58,15 @@ export default class AddTransactionsView extends Component {
     this.getTemplateTrans = getTemplateTransactions.bind(this);
     this.getCategories = this.getCategories.bind(this);
     this.getSubCategories = this.getSubCategories.bind(this);
+    this.getNewTransaction = this.getNewTransaction.bind(this);
+    this.getNewTransactionIndex = this.getNewTransactionIndex.bind(this);
+    this.setNewTransactionValue = this.setNewTransactionValue.bind(this);
+    this.currentMonthHasTransactions = this.currentMonthHasTransactions.bind(this);
+    this.convertBudgetItemsToTransactions = this.convertBudgetItemsToTransactions.bind(this);
   }
 
   componentDidMount() {
     this.getTrans();
-  }
-
-  getTransactionsFromDB() {
-    // PULL IN TEMPLATE BILLS AND ALL ACTUAL TRANSACTIONS
-    axios.get('/api/user-data').then( () => {
-      axios.get('/api/balance').then( balanceInfo => {
-        axios.get(`/api/transactions`).then( transactions => {
-          axios.get('/api/bills').then( bills => {
-            axios.get('/api/income').then( incomeSources => {
-              let parsedBills = bills.data.map( bill => {
-                bill.amount = Math.abs(currency(bill.amount).value) * -1;
-                return bill;
-              })
-              let parsedIncome = incomeSources.data.map( income => {
-                income.amount = Math.abs(currency(income.amount).value);
-                return income;
-              })
-              let parsedTransactions = transactions.data.map( transaction => {
-                let multiplier = transaction.type === 'income' ? 1 : -1;
-                transaction.amount = Math.abs(currency(transaction.amount).value) * multiplier;
-                return transaction;
-              })
-              console.log('received transactions: ', transactions.data);
-              this.setState({
-                bills: parsedBills,
-                incomeSources: parsedIncome,
-                transactions: parsedTransactions,
-                balanceInfo: balanceInfo.data,
-              }, () => this.putTransactionsInState())
-            }).catch( err => console.log('addtransactionsview - get income err: ', err));
-          }).catch( err => console.log('addtransactionsview - get bills err: ', err));
-        }).catch( err => console.log('addtransactionsview - get transactions err: ', err));
-      }).catch( err => console.log('addtransactionview - get balance err: ', err));
-    }).catch( err => {
-      console.log('user not logged in.');
-      this.props.history.push('/');
-    })
   }
 
   getCategories() {
@@ -116,8 +78,8 @@ export default class AddTransactionsView extends Component {
     })
     return categoriesJSX;
   }
-  getSubCategories() {
-    let subCategories = categories[this.state.category];
+  getSubCategories(category) {
+    let subCategories = categories[category];
     let subCategoriesJSX = []
     if(subCategories) {
       subCategoriesJSX = subCategories.map( subCat => {
@@ -168,167 +130,68 @@ export default class AddTransactionsView extends Component {
       selectedYear: year,
     }, () => this.putTransactionsInState());
   }
+
+  // ==========================================
+  getNewTransaction(id) {
+    let newTransactions = this.state.newTransactions.slice();
+    // RETURNS UNDEFINED IF NOT FOUND
+    return newTransactions.find( transaction => transaction.id === id);
+  }
+  setNewTransactionValue(target) {
+    let newTransactions = this.state.newTransactions.slice();
+    let value ='', prop = '', index = -1, id ='';
+    
+    switch(target.type) {
+      case 'radio':
+        id = target.id.substring(0, target.id.indexOf('-radio-'));
+        index = this.getNewTransactionIndex(id);
+        value = target.id.substring(target.id.indexOf('-radio-') + 7);
+        prop = 'transactionType';
+        break;
+      default:
+        id = target.id.substring(0, target.id.indexOf('-entry-'));
+        index = this.getNewTransactionIndex(id);
+        prop = target.id.substring(target.id.indexOf('-entry-') + 7);
+        if(prop === 'amount') {
+          value = Math.abs(currency(target.value).value);
+          break;
+        } else {
+          value = target.value;
+        }
+    }
+    if(index !== -1) {
+        newTransactions[index][prop] = value;
+    } else {
+      newTransactions.push({
+        id: id,
+        date: id,
+        [prop]: value
+      })
+    }
+    this.setState({ newTransactions });
+  }
+  getNewTransactionIndex(id) {
+    let newTransactions = this.state.newTransactions.slice();
+    let index = newTransactions.findIndex( transaction => transaction.id === id );
+    return index;
+  }
+
+  currentMonthHasTransactions() {
+    let monthNum = this.state.selectedMonth;
+    let yearNum = this.state.selectedYear;
+    let transactions = this.state.transactions.slice();
+    let index = transactions.findIndex( transaction => {
+      return(
+        new Date(transaction.date).getMonth === monthNum &&
+        new Date(transaction.date).getFullYear === yearNum);
+    });
+
+    return index !== -1;
+  }
+
   // =======================================================================================
-  
-  // =============================== PARSE TEMPLATES INTO TRANSACTIONS ===============================
-  getWeeklyTransactionsFromTemplate(template, dayFrom, dayThrough) {
-    let transactions = [];
-    let transactionType = template.hasOwnProperty('category') ? 'expense' : 'income';
-    
-    for(let day = new Date(dayFrom); day <= dayThrough; day.setDate(day.getDate() + 1)) {
-      if(day.getDay() === template.day_num && day >= new Date(template.start_date)) {
-        transactions.push({ transactionType, name: template.name, amount: currency(template.amount).value, category: template.category, subCategory: template.sub_category, day: new Date(day) });
-      }
-    }
-    return transactions;
-  }
-
-  getMonthlyTransactionsFromTemplate(template, dayFrom, dayThrough) {
-    let transactions = [];
-    let transactionType = template.hasOwnProperty('category') ? 'expense' : 'income';
-    let dayIsLastDayOfMonth = false;
-    
-    for(let day = new Date(dayFrom); day <= dayThrough; day.setDate(day.getDate() + 1)) {
-      dayIsLastDayOfMonth = day.getDate() === (new Date(day.getFullYear(), day.getMonth() + 1 , 0)).getDate();
-      if(template.day_num > day.getDate() && dayIsLastDayOfMonth && day >= new Date(template.start_date)){
-        transactions.push({ transactionType, name: template.name, amount: currency(template.amount).value, category: template.category, subCategory: template.sub_category, day: new Date(day) });
-      }
-      if(day.getDate() === template.day_num && day >= new Date(template.start_date)) {
-        transactions.push({ transactionType, name: template.name, amount: currency(template.amount).value, category: template.category, subCategory: template.sub_category, day: new Date(day) });
-      }
-    }
-    return transactions;
-  }
-
-  getEOWTransactionsFromTemplate(template, dayFrom, dayThrough) {
-    let transactions = [];
-    let transactionType = template.hasOwnProperty('category') ? 'expense' : 'income';
-    let startDate = new Date(template.start_date);
-
-    for(let day = new Date(dayFrom); day <= dayThrough; day.setDate(day.getDate() + 1)) {
-      let timeDiff = Math.abs(day.getTime() - startDate.getTime());
-      let diffDays = Math.ceil(timeDiff / (1000 * 3600 * 24)); 
-      if(diffDays % 14 === 0 && day >= new Date(template.start_date)) {
-        transactions.push({ transactionType, name: template.name, amount: currency(template.amount).value, category: template.category, subCategory: template.sub_category, day: new Date(day) });
-      }
-    }
-    return transactions;
-  }
-
-  getXDAYSTransactionsFromTemplate(template, dayFrom, dayThrough) {
-    let transactions = [];
-    let transactionType = template.hasOwnProperty('category') ? 'expense' : 'income';
-    let startDate = new Date(template.start_date);
-
-    for(let day = new Date(dayFrom); day <= dayThrough; day.setDate(day.getDate() + 1)) {
-      let timeDiff = Math.abs(day.getTime() - startDate.getTime());
-      let diffDays = Math.ceil(timeDiff / (1000 * 3600 * 24)); 
-      if(diffDays % template.day_num === 0 && day >= new Date(template.start_date)) {
-        transactions.push({ transactionType, name: template.name, amount: currency(template.amount).value, category: template.category, subCategory: template.sub_category, day: new Date(day) });
-      }
-    }
-    return transactions;
-  }
-  // ==========================================================================================
-
-  getTemplateTransactions(dayFrom, dayThrough) {
-    let bills = this.state.bills.slice();
-    let income = this.state.incomeSources.slice();
-    let budgetTempate = bills.concat(income);
-    let templateTransactions = [];
-    for(let i = 0; i < budgetTempate.length; i++) {
-      switch(budgetTempate[i].frequency_type) {
-        case WEEK: templateTransactions =  templateTransactions.concat(this.getWeeklyTransactionsFromTemplate(budgetTempate[i], dayFrom, dayThrough));
-          break;
-        case MONTH: templateTransactions = templateTransactions.concat(this.getMonthlyTransactionsFromTemplate(budgetTempate[i], dayFrom, dayThrough));
-          break;
-        case EOW: templateTransactions = templateTransactions.concat(this.getEOWTransactionsFromTemplate(budgetTempate[i], dayFrom, dayThrough));
-          break;
-        case XDAYS: templateTransactions = templateTransactions.concat(this.getXDAYSTransactionsFromTemplate(budgetTempate[i], dayFrom, dayThrough));
-          break;
-        default: break;
-      }
-    }
-    return templateTransactions;
-  }
-
-  initializeTransactions(transactionsInput = []) {
-    let transactions = transactionsInput.length ? transactionsInput : this.state.transactions.slice();
-    let balanceDate = new Date(this.state.balanceInfo.date);
-    let balanceAmount = this.state.balanceInfo.amount ? currency(this.state.balanceInfo.amount) : 0;
-    let startDate = new Date(balanceDate.getFullYear(), balanceDate.getMonth(), 1);
-    // IF THERE ARE NO TRANSACTIONS YET, SET lastTransactionDate TO TODAY;
-    let lastTransactionDate = transactions.length ? new Date(transactions[transactions.length -1].date) : new Date();
-    let lastDayOfSelectedMonth = new Date(this.state.selectedYear, this.state.selectedMonth + 1, 0);
-    // END DATE WILL EQUAL LAST TRANSACTION DATE OR LAST DAY OF SELECTED MONTH - WHICHEVER IS GREATER
-    let endDate = lastTransactionDate >= lastDayOfSelectedMonth ? new Date(lastTransactionDate) : new Date(lastDayOfSelectedMonth);
-    let months = [];
-
-    // GET EVERY MONTH INBETWEEN THE TWO DATES INTO AN ARRAY
-    for(let day = new Date(startDate); day <= endDate; day.setDate(day.getDate() + 1)) {
-      if(months.length) {
-        if(months.findIndex( month => month.monthNum === day.getMonth() && month.yearNum === day.getFullYear()) === -1) {
-          months.push({ monthNum: day.getMonth(), yearNum: day.getFullYear() });
-        }
-      } else {
-        months.push({ monthNum: day.getMonth(), yearNum: day.getFullYear() });
-      }
-    }
-
-    let formattedTransactions = [];
-    let month = null;
-    let year = null;
-    let firstDayOfCurrentMonth = null;
-    let lastDayOfCurrentMonth = null;
-    // FOR EVERY MONTH - CHECK IF THERE IS A TRANSACTION OR NOT
-    for(let i = 0; i < months.length; i++) {
-      month = months[i].monthNum;
-      year = months[i].yearNum;
-      let index = transactions.findIndex( transaction => { 
-        return  new Date(transaction.date).getMonth() === month &&
-          new Date(transaction.date).getFullYear() === year;
-      });
-      // IF THERE IS A TRANSACTION FOR THE MONTH
-      if(index !== -1) {
-        firstDayOfCurrentMonth = new Date(year, month, 1);
-        lastDayOfCurrentMonth = new Date(year, month + 1, 0);
-        for(let day = new Date(year, month, 1); day <= lastDayOfCurrentMonth; day.setDate(day.getDate() + 1)) {
-          for(let j = 0; j < transactions.length; j ++) {
-            const { name, amount, date, type, category, subCategory, id } = transactions[j];
-            if(new Date(date).isSameDateAs(day)) {
-              balanceAmount = currency(balanceAmount).add(amount).value;
-              formattedTransactions.push({ id, transactionType: type, balance: balanceAmount, name, amount: currency(amount).value, category, subCategory, day: new Date(date)  });
-            }
-          }
-        }
-      } else { // GET budgetTemplate FOR MONTH
-        let budgetTemplate = this.getTemplateTransactions(new Date(year, month ,1), new Date(year, month + 1, 0));
-        budgetTemplate.sort( (firstItem, secondItem) => {
-          return firstItem.day - secondItem.day;
-        })
-        for(let i = 0; i < budgetTemplate.length; i++) {
-          balanceAmount = currency(balanceAmount).add(budgetTemplate[i].amount).value;
-          budgetTemplate[i].balance = balanceAmount;
-        }
-        formattedTransactions = formattedTransactions.concat(budgetTemplate);
-      }
-    }
-    // ADD A KEY WHICH CORRESPONDS THE THE TRANSACTIONS INDEX. WHEN OTHER ARRAYS ARE MADE FROM THIS ARRAY
-    // AND THEN FILTERED - THEY WILL HAVE A REFERENCE TO THIS ARRAY, WHICH WILL BE IN STATE.
-    formattedTransactions.map( (transaction, i) => transaction.formattedTransactionKey = i );
-    let firstDayOfSelectedMonth = new Date(this.state.selectedYear, this.state.selectedMonth, 1 );
-    let currentMonthTransactions = formattedTransactions.filter( transaction => {
-      return transaction.day >= firstDayOfSelectedMonth && transaction.day <= lastDayOfSelectedMonth;
-    })
-    currentMonthTransactions = currentMonthTransactions.map((transaction, i) => {
-      transaction.currentMonthTransactionKey = i;
-      return transaction;
-    });
-    this.setState({
-      fullTransactionSet: formattedTransactions,
-      currentMonthTransactions: currentMonthTransactions,
-    });
-  }
+  // =========================== GENERATE BUDGET TABLE =====================================
+  // =======================================================================================
   
   populateTransactionsByMonth(){
     let firstDayOfSelectedMonth = new Date(this.state.selectedYear, this.state.selectedMonth, 1 );
@@ -461,27 +324,25 @@ export default class AddTransactionsView extends Component {
             {subTransactionHeader}
             {dailyTransactions}
             <div className='transaction-table-entry-row' id={dayID + '-entry-row'}>
-              <input id={dayID + '-entry-name'}      placeholder="name - e.g. 'Water'"></input>
-              <input id={dayID + '-entry-amount'}    placeholder='amount' type='number'></input>
-              <input id={dayID + '-entry-category'}  placeholder='category'></input>
-              <input id={dayID + '-entry-subCategory'}  placeholder='subcategory'></input>
-              <select id='category' className='create-budget-field category category-select' value={this.state.category} onChange={ e => this.eventHandler(e)}>
-                <option selected> -- select an option -- </option>
+              <input id={dayID + '-entry-name'}      value={this.getNewTransaction(`${dayID}`) && this.getNewTransaction(`${dayID}`).name || ''} placeholder="name - e.g. 'Water'" onChange={e => this.setNewTransactionValue(e.target)}></input>
+              <input id={dayID + '-entry-amount'}    value={this.getNewTransaction(`${dayID}`) && this.getNewTransaction(`${dayID}`).amount || ''} placeholder='amount' type='number' onChange={e => this.setNewTransactionValue(e.target)}></input>
+              <select id={dayID + '-entry-category'} value={this.getNewTransaction(`${dayID}`) && this.getNewTransaction(`${dayID}`).category || ''} onChange={e => this.setNewTransactionValue(e.target)}>
+                <option selected> --category-- </option>
                 {this.getCategories()}
-              </select>
-              <select id='subCategory' className='create-budget-field category sub-category-select' value={this.state.subCategory} onChange={ e => this.eventHandler(e)}>
-                  <option selected> -- select an option -- </option>
-                  {this.getSubCategories()}
+                </select>
+              <select id={dayID + '-entry-subCategory'} value={this.getNewTransaction(`${dayID}`) && this.getNewTransaction(`${dayID}`).subCategory} onChange={e => this.setNewTransactionValue(e.target)}>
+                <option selected> --subcategory-- </option>
+                {this.getSubCategories(this.getNewTransaction(`${dayID}`) && this.getNewTransaction(`${dayID}`).category)}
               </select>
               <div className='income-radio radio-container'>
                 <label htmlFor={dayID + '-radio-income'}>Income</label>
-                <input id={dayID + '-radio-income'}  type='radio' name={`${dayID}-transaction-type`}></input>
+                <input id={dayID + '-radio-income'}  type='radio' name={`${dayID}-transaction-type`} checked={this.getNewTransaction(`${dayID}`) && this.getNewTransaction(`${dayID}`).transactionType === 'income'} onChange={e => this.setNewTransactionValue(e.target)}></input>
               </div>
               <div className='expense-radio radio-container'>
                 <label htmlFor={dayID + '-radio-expense'}>Expense</label>
-                <input id={dayID + '-radio-expense'} type='radio' name={`${dayID}-transaction-type`} checked></input>
+                <input id={dayID + '-radio-expense'} type='radio' name={`${dayID}-transaction-type`} checked={this.getNewTransaction(`${dayID}`) && this.getNewTransaction(`${dayID}`).transactionType === 'expense'} onChange={e => this.setNewTransactionValue(e.target)}></input>
               </div>
-              <button id={dayID + '-add-button'} onClick={e => this.addTransaction(e)} >Add</button>
+              <button id={dayID + '-add-button'} onClick={e => this.addTransaction(e.target)} >Add</button>
             </div>
           </div>
         </div>
@@ -496,7 +357,6 @@ export default class AddTransactionsView extends Component {
   updateTransactionValues(e) {
     let index = parseInt(e.target.id.replace(/\D/g, ''));
     let prop = e.target.id.substring(index.toString().length + 1);
-    // let prop = e.target.id.split('-')[1];
     let currentMonthTransactions = this.state.currentMonthTransactions.slice();
     if(prop.includes('radio')) {
       currentMonthTransactions[index].transactionType = currentMonthTransactions[index].transactionType === 'income' ? 'expense' : 'income';
@@ -567,7 +427,7 @@ export default class AddTransactionsView extends Component {
       axios.put(`/api/transaction`, updatedTransaction).then( transaction => {
         updatedTransaction.amount = updatedTransaction.type === 'income' ? updatedTransaction.amount : updatedTransaction.amount *-1;
         transactionsCopy.splice(transactionIndex, 1, updatedTransaction);
-        this.setState({ transactions: transactionsCopy }, () => this.initializeTransactions());
+        this.setState({ transactions: transactionsCopy }, () => this.putTransactionsInState());
       }).catch( err => console.log('addtransactionview - edit transaction err: ', err));
     } else {
       let fullTransactionSetCopy = this.state.fullTransactionSet.slice();
@@ -593,7 +453,7 @@ export default class AddTransactionsView extends Component {
           });
           this.setState({
             transactions: parsedTransactions,
-          }, () => this.initializeTransactions());
+          }, () => this.putTransactionsInState());
         })
       })
     }
@@ -613,70 +473,64 @@ export default class AddTransactionsView extends Component {
         console.log('delete successful');
         this.setState({
           transactions: transactionsCopy,
-        }, () => this.initializeTransactions());
+        }, () => this.putTransactionsInState());
       }).catch(err => console.log('AddTransactionsView.js - deleteTransaction err: ', err));
+    } else {
       // IT THIS IS A BUDGET TEMPLATE ITEM TRYING TO BE DELETED, ADD ALL TEMPLATE ITEMS FOR THE MONTH
-    // TO THE TRANSACTIONS TABLE EXCEPT THIS TEMPLATE ITEM
-  } else { //ADD ALL BUDGET TEMPLATE TRANSACTIONS TO THE DATABASE
+      // TO THE TRANSACTIONS TABLE EXCEPT THIS TEMPLATE ITEM
+      // PASS THE ITEMS indexInState THAT WE WANT DELETED TO IT'S NOT ADDED TO THE TRANSACTIONS TABLE
+      this.convertBudgetItemsToTransactions(indexInState);
+    }
+  }
+
+  convertBudgetItemsToTransactions(deleteItemIndex = -1) {
     let fullTransactionSetCopy = this.state.fullTransactionSet.slice();
     // GET ALL BUDGET TEMPLATE ITEMS FOR THE CURRENT MONTH
     let budgetTempateItems = fullTransactionSetCopy.filter( transaction => {
       return( !transaction.hasOwnProperty('id') &&
       transaction.day.getMonth() === this.state.selectedMonth &&
       transaction.day.getFullYear() === this.state.selectedYear &&
-      transaction.key !== parseInt(indexInState));
+      transaction.key !== parseInt(deleteItemIndex)); // <--IF AN ITEM IS BEING DELETED
     });
-    // CHANGE THE PROPERTY TYPE transactionType TO type SINCE THAT'S WHAT THE '/api/transactions' ENDPOINT IS EXPECTING
+    // CONVERT DATE STRING TO ACTUAL DATE OBJECT, AND CHANGE ALL AMOUNTS TO ABSOLUTE NUMBERS
     budgetTempateItems.map( transaction => {
-      transaction.type = transaction.transactionType;
-      delete transaction.transactionType;
       transaction.day = new Date(transaction.day);
       transaction.amount = Math.abs(currency(transaction.amount).value);
     });
-    console.log('budget items: ', budgetTempateItems);
     axios.post('/api/transactions', {transactionsArray: budgetTempateItems}).then( transactions => {
       axios.get('/api/transactions').then( allTransactions => {
         let parsedTransactions = allTransactions.data.map( transaction => {
-            let multiplier = transaction.type === 'income' ? 1 : -1;
-            transaction.amount = currency(transaction.amount).multiply(multiplier).value;
-            return transaction;
-          });
-          this.setState({
-            transactions: parsedTransactions,
-          }, () => this.initializeTransactions());
-        })
+          let multiplier = transaction.type === 'income' ? 1 : -1;
+          transaction.amount = currency(transaction.amount).multiply(multiplier).value;
+          return transaction;
+        });
+        this.setState({
+          transactions: parsedTransactions,
+        }, () => this.putTransactionsInState());
       })
-    }
+    })
   }
   
   // =========================================== ADD ===========================================
-  addTransaction(e) {
-    let id = e.target.id.replace('-add-button', '');
-    let name = document.getElementById(id + '-entry-name');
-    let amount = document.getElementById(id + '-entry-amount');
-    let category = document.getElementById(id + '-entry-category');
-    let radioIncome = document.getElementById(id + '-radio-income'); //WE DON'T NEED TO GET THE EXPENSE RADIO BUTTON - WE CAN JUST CHECK WHETHER INCOME IS CHECKED OR NOT
-    
-    let newTransaction = {
-      name: name.value,
-      amount: Math.abs(currency(amount.value).value),
-      category: category.value,
-      type: radioIncome.checked ? 'income' : 'expense',
-      date: new Date(id.replace(/-/g, '/')),
-    }
-    
-    name.value = ''; amount.value = '', category.value = ''; radioIncome.checked = false;
+  addTransaction(target) {
+    // THE ID PROPERTY OF NEW TRANSACTIONS EQUALS THE DATE OF THE TRANSACTIONS. ID WILL BE USED AS THE DATE TO SEND TO THE SERVER
+    let id = target.id.substring(0, target.id.indexOf('-add-button'));
+    let newTransactions = this.state.newTransactions.slice();
+    let transactionToAdd = newTransactions.splice(this.getNewTransactionIndex(id),1)[0];
 
-    axios.post('/api/transaction', newTransaction).then( response => {
+    if(!this.currentMonthHasTransactions()) {
+      this.convertBudgetItemsToTransactions();
+    };
+
+    axios.post('/api/transaction', transactionToAdd).then( response => {
       let transactionsCopy = this.state.transactions.slice();
-      let newTransactions = response.data.map( transaction => {
-        let multiplier = transaction.type === 'income' ? 1 : -1;
-        transaction.amount = currency(transaction.amount).multiply(multiplier).value;
-        return transaction;
-      })
+      let addedTransaction = response.data[0];
+      addedTransaction.amount = addedTransaction.type === 'income' ? addedTransaction.amount : currency(addedTransaction.amount).multiply(-1).value;
+      transactionsCopy.push(addedTransaction);
       this.setState({
-        transactions: transactionsCopy.concat(newTransactions),
-      }, () => this.initializeTransactions())
+        transactions: transactionsCopy,
+        newTransactions: newTransactions,
+      }, () => this.putTransactionsInState())
     }).catch( err => console.log('addTransactionView.js addTransaction err: ', err));
   }
   

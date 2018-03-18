@@ -442,7 +442,7 @@ export default class CreateBudgetView extends Component {
         case MONTH:
           return <DaySelectorByMonth selectorSection='bill' selectedDays={this.state.currentBill.frequencyDays} updateDays={this.updateSelectedBillDays}/>;
         case XDAYS:
-          return <input id='every-x-days' className='every-x-days-input' type='number' value={this.state.currentBill.frequencyDays[0]} onChange={e => this.updateSelectedBillDays(e.target)}></input>;
+          return <input placeholder='enter number of days' id='every-x-days' className='every-x-days-input' type='number' value={this.state.currentBill.frequencyDays[0]} onChange={e => this.updateSelectedBillDays(e.target)}></input>;
         default: return null;
       }
     } else if(id === 'currentIncomeSource') {
@@ -452,7 +452,7 @@ export default class CreateBudgetView extends Component {
         case MONTH:
           return <DaySelectorByMonth selectorSection='income' selectedDays={this.state.currentIncomeSource.frequencyDays} updateDays={this.updateSelectedIncomeDays}/>;
         case XDAYS:
-          return <input id='every-x-days' className='every-x-days-input' type='number' value={this.state.currentIncomeSource.frequencyDays[0]} onChange={e => this.updateSelectedIncomeDays(e.target)}></input>;
+          return <div><input placeholder='enter number of days' id='every-x-days' className='every-x-days-input' type='number' value={this.state.currentIncomeSource.frequencyDays[0]} onChange={e => this.updateSelectedIncomeDays(e.target)}></input></div>;
         default: return null;
       }
     }
@@ -491,6 +491,9 @@ export default class CreateBudgetView extends Component {
       <Header />
         <div className='create-budget-title'>
           <h1>Create A New Budget</h1>
+        </div>
+        <div>
+        <button onClick={this.saveBudgetTemplate}>Save Budget Template</button>
         </div>
         <div className='balance-entry-container entry-container'>
           <h2>Starting Balance</h2>
@@ -538,7 +541,7 @@ export default class CreateBudgetView extends Component {
             </div>
             <div className='income-list-container list-container'>
               <label htmlFor='income-list'>Income List</label>
-              <select id='income-list' className='income-list budget-list' size={2 + this.state.incomeSources.length}>
+              <select id='income-list' className='income-list budget-list' size={1 + this.state.incomeSources.length}>
                 {incomeSources && incomeSources}
               </select>
             </div>
@@ -575,7 +578,7 @@ export default class CreateBudgetView extends Component {
             <label>End Date</label>
             <input id='bill-endDate' type='date' className='create-budget-field' value={this.state.currentBill.endDate} onChange={ e => this.updateCurrentBillValues(e)}></input>
           </div>
-          <div>
+          <div className='category-container'>
             <label>Category</label>
             <select id='bill-category' className='create-budget-field category category-select' value={this.state.currentBill.category} onChange={ e => this.updateCurrentBillValues(e)}>
               <option selected> -- select an option -- </option>
@@ -594,13 +597,12 @@ export default class CreateBudgetView extends Component {
             </div>
             <div className='bills-list-container list-container'>
               <label htmlFor='bill-list'>Bill List</label>
-              <select id='bill-list' className='bills-list budget-list' size={2 + this.state.bills.length}>
+              <select id='bill-list' className='bills-list budget-list' size={1 + this.state.bills.length}>
                 {bills && bills}
               </select>
             </div>
           </div>
         </div>
-        <button onClick={this.saveBudgetTemplate}>Save Budget Template</button>
       </div>
     )
   }

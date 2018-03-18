@@ -1,6 +1,7 @@
 hr {
   width: 85%;
-  height: 4px;
+  margin: auto;
+  /* height: 2px; */
 }
 
 button {
@@ -53,12 +54,12 @@ small {
 }
 
 .header div h1 {
-  font-family: 'Lobster', cursive;
+  font-family: 'Comfortaa', cursive;
   font-size: 35px;
-  letter-spacing: 4px;
+  letter-spacing: -3px;
   font-weight: bold;
-  color: #2AD705;
-  text-shadow: 4px 4px #0973B3;
+  color: #0973B3;
+  text-shadow: 2px 2px black;
 }
 .header div {
   margin-left: 5px;
@@ -99,8 +100,11 @@ small {
 }
  
 .login-component h1 {
-  font-family: 'Lobster', cursive;
+  font-family: 'Comfortaa', cursive;
   font-size: 40px;
+  letter-spacing: -3px;
+  font-weight: bold;
+  text-shadow: 2px 2px #0973B3;
   padding: 10px;
   position: fixed;
   top: 0px;
@@ -121,7 +125,9 @@ small {
 .welcome-container h2 {
   text-align: center;
   font-size: 50px;
-  font-family: 'Lobster', cursive;
+  font-family: 'Comfortaa', cursive;
+  font-weight: bolder;
+  text-shadow: 2px 2px #2AD705;
 }
 
 .color-strip-container {
@@ -199,10 +205,7 @@ small {
 }
 
 .panel {
-  min-height: 100vh;
-}
-
-.panel {
+  min-height: 90vh;
   display: flex;
   align-items: center;
 }
@@ -237,18 +240,24 @@ small {
   margin: 10px 10px 10px 0;
 }
 .panel-content{
-  margin-left: 20px;
+
 }
  
 #panel-1 {
   background-color: rgba(13, 166, 255, 0.8);
   color: white;
 }
+#panel-1 h2 { text-shadow: 2px 2px black; }
+#panel-2 h2 { text-shadow: 2px 2px white; }
+#panel-3 h2 { text-shadow: 2px 2px black; }
+#panel-4 h2 { text-shadow: 2px 2px white; }
+
 #panel-2 {
   background-color: rgba(102, 255, 0, 0.8);
 }
 #panel-3 {
   background-color: rgba(255, 242, 0, 0.8);
+  color: white;
 }
 #panel-4 {
   background-color: rgba(13, 166, 255, 0.8);
@@ -531,15 +540,17 @@ small {
   display: flex;
   justify-content: space-between;
   margin: auto;
-}
-.chart-container {
-  background-color: white;
   width: 90%;
-  margin: 20px auto;
-  border-radius: 10px;
-  border: 3px solid #0973B3;
 }
-
+.nav-buttons-container button {
+  color: white;
+  font-size: 15px;
+  background-color: #0973B3;
+  border-radius: 5px;
+  padding: 5px;
+  font-weight: bold;
+  margin: 5px 0;
+}
 .current-financial-summary {
   border: 1px solid black;
   display: flex;
@@ -551,7 +562,7 @@ small {
   background-color: white;
 }
 .current-financial-summary > * {
-  margin: 5px;
+  margin: 10px;
   font-size: 15px;
   font-weight: bold;
 }
@@ -561,6 +572,8 @@ small {
 }
 .current-financial-summary label {
   text-decoration-line: underline;
+  color: #0973B3;
+  font-size: 17px;
 }  
 .upcoming-bills-container > .row {
   display: flex;
@@ -596,6 +609,47 @@ small {
   flex: 1;
   overflow: hidden;
 }
+
+.financial-status-container .status {
+  font-size: 15px;
+  margin-left: 10px;
+}
+.financial-status-container .status-bad {
+  color: red;
+  border: 1px solid red;
+  background-color: rgba(255, 0, 0, 0.15);
+  border-radius: 5px;
+  padding: 5px;
+}
+.financial-status-container .status-good {
+  color: green;
+  border: 1px solid green;
+  background-color: rgba(0, 128, 0, 0.15);
+  border-radius: 5px;
+  padding: 5px;
+}
+.chart-container {
+  background-color: white;
+  width: 90%;
+  margin: auto;
+  border-radius: 10px;
+  border: 3px solid #0973B3;
+}
+.chart-criteria-container {
+  display: flex;
+  width: 90%;
+  margin: auto;
+}
+.chart-criteria-container > * {
+  margin: 10px 10px 5px 10px;
+}
+.chart-criteria-container select {
+  border-radius: 5px;
+  padding: 5px;
+  color: #0973B3;
+  font-weight: bold;
+  border: 2px solid #0973B3;
+}
 /* 
 =================================================================
 ====================== CREATE BUDGET COMPONENT ==================
@@ -620,7 +674,7 @@ small {
 
 .entry-container {
   width: 90%;
-  margin: auto;
+  margin: 10px auto;
   background-color: rgba(202, 235, 242, 0.842);
   border: solid 5px #0973B3;
   border-top-right-radius: 20px;
@@ -630,7 +684,7 @@ small {
 .entry-container select {
   font-size: 15px;
   font-weight: bold; 
-  width: 100px;
+  overflow: hidden;
 }
 
 .entry-container > * {
@@ -642,6 +696,12 @@ small {
   margin: 10px auto;
 }
 
+.entry-container > div > * {
+  flex: 1;
+}
+.category-container > select {
+  margin: 5px 0;
+}
 .week-days-selector {
   margin-left: 30px;
 }
@@ -769,6 +829,22 @@ small {
   }
   .dashboard-button {
     font-size: 40px !important;
+  }
+  #panel-1 > * {
+    width: 40%;
+    margin-left: 50px;
+  }
+  #panel-2 > * {
+    width: 40%;
+    margin: auto;
+  }
+  #panel-3 > * {
+    width: 40%;
+    margin-left: 40%;
+  }
+  #panel-4 > * {
+    width: 40%;
+    margin: auto;
   }
 }
 

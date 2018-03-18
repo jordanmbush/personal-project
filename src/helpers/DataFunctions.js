@@ -134,6 +134,7 @@ export function initializeTransactions(transactionsInput = []) {
   let endDate = lastTransactionDate >= lastDayOfSelectedMonth ? new Date(lastTransactionDate) : new Date(lastDayOfSelectedMonth);
   let months = [];
 
+  
   // GET EVERY MONTH INBETWEEN THE TWO DATES INTO AN ARRAY
   for(let day = new Date(startDate); day <= endDate; day.setDate(day.getDate() + 1)) {
     if(months.length) {

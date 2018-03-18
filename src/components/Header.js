@@ -13,8 +13,11 @@ export default class Header extends Component {
 
   logout() {
     axios.post('/api/logout').then( response => {
+      this.props.history.push('/');
+    }).catch( err => {
+      console.log('header.js - logout err: ', err);
       window.location = '/';
-    }).catch( err => console.log('header.js - logout err: ', err));
+    });
   }
 
   render() {
