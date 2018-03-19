@@ -98,8 +98,8 @@ export default class AddTransactionsView extends Component {
     let year = this.state.selectedYear;
 
     month++;
-    if(month > 12) {
-      month = 1;
+    if(month >= 12) {
+      month = 0;
       year++;
     }
     
@@ -123,8 +123,8 @@ export default class AddTransactionsView extends Component {
     let month = this.state.selectedMonth;
     let year = this.state.selectedYear;
     month--;
-    if(month === 0) {
-      month = 12;
+    if(month < 0) {
+      month = 11;
       year--;
     }
     this.setState({
@@ -262,7 +262,7 @@ export default class AddTransactionsView extends Component {
 
         dailyTransactions.push(
           <div className='transaction-table-row' id={`${dayID}-${i}`}>
-            <div className='transaction-info' onClick={() => this.toggleRowButtonsVisibility(`${dayID}-${i}`)}>
+            <div className='transaction-info' onClick={() => this.toggleRowButtonsVisibility(`${dayID}-${i}`, `${currentMonthTransactionKey}-edit-button`)}>
                 <div><input disabled id={`${currentMonthTransactionKey}-balance`} className='transaction-balance' onChange={e => this.updateTransactionValues(e)} value={currency(this.state.currentMonthTransactions[currentMonthTransactionKey].balance).format(true)}></input></div>
                 <div><input disabled id={`${currentMonthTransactionKey}-name`} className='transaction-name' onChange={e => this.updateTransactionValues(e)} value={this.state.currentMonthTransactions[currentMonthTransactionKey].name}></input></div>
                 <div><input disabled id={`${currentMonthTransactionKey}-amount`} className='transaction-amount' onChange={e => this.updateTransactionValues(e)} value={currency(this.state.currentMonthTransactions[currentMonthTransactionKey].amount).value} type='number'></input></div>
@@ -585,18 +585,20 @@ export default class AddTransactionsView extends Component {
       toggleButton.className = 'show-fields'
     }
   }
-  toggleRowButtonsVisibility(dayID) {
+  toggleRowButtonsVisibility(dayID, editButtonID) {
     let buttonContainer = document.getElementById(dayID + '-buttons');
     let buttonContainerClassList = buttonContainer.className.split(' ');
-
+    let saveButton = document.getElementById(editButtonID);
     let index = buttonContainerClassList.indexOf('row-hidden');
     
     if(index !== -1) {
       buttonContainerClassList.splice(buttonContainerClassList.indexOf('row-hidden'),1)
       buttonContainer.className = buttonContainerClassList.join(' ');
     } else {
-      buttonContainerClassList.push('row-hidden');
-      buttonContainer.className = buttonContainerClassList.join(' ');
+      if(saveButton.innerText === 'Edit') {
+        buttonContainerClassList.push('row-hidden');
+        buttonContainer.className = buttonContainerClassList.join(' ');
+      }
     }
   }
   
