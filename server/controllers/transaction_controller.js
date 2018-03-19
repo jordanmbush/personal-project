@@ -44,10 +44,11 @@ module.exports = {
     let transactions = req.body.transactionsArray;
     let addedTransactions = [];
     const db = req.app.get('db');
+    console.log("req-body: ", req.body)
     for(let i = 0; i < transactions.length; i++) {
-      const { name, amount, day, category, subCategory, transactionType } = transactions[i];
+      const { name, amount, day, category, subCategory, type } = transactions[i];
       
-      db.add_transaction([user_id, name, amount, day, category, subCategory, transactionType]).then( transaction => {
+      db.add_transaction([user_id, name, amount, day, category, subCategory, type]).then( transaction => {
         addedTransactions = addedTransactions.concat(transaction);
       }).catch( err => {
         console.log('transaction_controller.js - addTransaction err: ', err);
