@@ -25,9 +25,11 @@ export default class Dashboard extends Component {
     this.state = {
       transactions: [],
       selectedYear: (new Date).getFullYear(),
-      selectedMonth: (new Date).getMonth(),
-      category: '',
-      subCategory: '',
+      selectedMonth: 0,
+      fromMonth: 0,
+      throughMonth: (new Date).getMonth(),
+      category: '--filter category--',
+      subCategory: '--filter subcategory--',
       filteredTransactions: [],
       chartData: {
         labels: monthNames,
@@ -69,13 +71,13 @@ export default class Dashboard extends Component {
 
   getChartData() {
     let months = monthNames.slice();
-    let labels = months.splice(0, parseInt(this.state.selectedMonth) + 1);
+    let labels = months.splice(this.state.fromMonth, this.state.throughMonth - this.state.fromMonth + 1);
 
     let expenseData = [];
     let incomeData = [];
 
     if(this.state.fullTransactionSet) {
-      for(let i = 0; i < this.state.selectedMonth + 1; i++ ) {
+      for(let i = this.state.fromMonth; i <= this.state.throughMonth; i++ ) {
         let fullTransactionSet = this.state.fullTransactionSet.slice();
         let monthData = fullTransactionSet.filter( transaction => {
           return transaction.day.getMonth() === i;
@@ -115,7 +117,7 @@ export default class Dashboard extends Component {
   
   getChartDataByCategory() {
     let months = monthNames.slice();
-    let labels = months.splice(0, parseInt(this.state.selectedMonth) + 1);
+    let labels = months.splice(this.state.fromMonth, this.state.throughMonth - this.state.fromMonth + 1);
 
     let expenseData = [];
     let datasets = [];
@@ -124,11 +126,25 @@ export default class Dashboard extends Component {
       allMonths = allMonths.filter( transaction => {
         let monthNum = transaction.day.getMonth();
         let year = transaction.day.getFullYear();
-        return monthNum >= 0 && monthNum <= this.state.selectedMonth && year === this.state.selectedYear && transaction.category;
+        return monthNum >= this.state.fromMonth && monthNum <= this.state.throughMonth && year === this.state.selectedYear && transaction.category;
       });
-      let usedCategories = allMonths.map(transaction => transaction.category);
-      let objCategories = new Set( usedCategories );
-      let uniqueCategories = Array.from(objCategories);
+      
+      let uniqueCategories = [];
+      let catType = '';
+      if(this.state.subCategory !== '--filter subcategory--') {
+        uniqueCategories.push(this.state.subCategory)
+        catType = 'subCategory';
+      } else if(this.state.category !== '--filter category--') { //IF THERE IS A SUBCATEGORY IN STATE
+        let usedSubCategories = allMonths.map(transaction => transaction.subCategory);
+        let objSubCategories = new Set( usedSubCategories );
+        uniqueCategories = Array.from(objSubCategories);
+        catType = 'subCategory';
+      } else {
+        let usedCategories = allMonths.map(transaction => transaction.category);
+        let objCategories = new Set( usedCategories );
+        uniqueCategories = Array.from(objCategories);
+        catType = 'category';
+      }
 
       for(let i = 0; i < uniqueCategories.length; i++) {
         datasets.push({
@@ -136,24 +152,18 @@ export default class Dashboard extends Component {
           data: [],
           backgroundColor: colors[i],
         })
-        for(let j = 0; j <= this.state.selectedMonth; j++) {
+        for(let j = 0; j <= this.state.fromMonth; j++) {
           datasets[i].data.push(0);
         }
       }
       
-      for(let i = 0; i <= this.state.selectedMonth; i++) {
+      for(let i = this.state.fromMonth; i <= this.state.throughMonth; i++) {
         let fullTransactionSet = this.state.fullTransactionSet.slice();
         let monthTransactions = fullTransactionSet.filter( transaction => transaction.day.getMonth() === i && transaction.day.getFullYear() === this.state.selectedYear && transaction.category);
         monthTransactions.map( transaction => {
-          let index = datasets.findIndex(dataset => dataset.label === transaction.category);
+          let index = datasets.findIndex(dataset => dataset.label === transaction[catType]);
           if(index !== -1) {
             datasets[index].data[i] = currency(datasets[index].data[i]).add(Math.abs(transaction.amount)).value;
-          } else {
-            datasets.push({
-              label: transaction.category,
-              data: []
-            });
-
           }
         })
       }
@@ -165,9 +175,10 @@ export default class Dashboard extends Component {
     }
   }
   
-  setSelectedMonth(e) {
+  setSelectedMonth(e, monthType) {
+
     this.setState({
-      selectedMonth: e.target.value
+      [monthType]: parseInt(e.target.value),
     }, () => this.putTransactionsInState());
   }
   
@@ -297,28 +308,38 @@ export default class Dashboard extends Component {
           <div className='balance'></div>
         </div>
         <div className='chart-criteria-container'>
-          <select onChange={ e => this.setSelectedMonth(e)} className='chart-month'>
-            <option selected={this.state.selectedMonth === 0} value={0}>January</option>
-            <option selected={this.state.selectedMonth === 1} value={1}>February</option>
-            <option selected={this.state.selectedMonth === 2} value={2}>March</option>
-            <option selected={this.state.selectedMonth === 3} value={3}>April</option>
-            <option selected={this.state.selectedMonth === 4} value={4}>May</option>
-            <option selected={this.state.selectedMonth === 5} value={5}>June</option>
-            <option selected={this.state.selectedMonth === 6} value={6}>July</option>
-            <option selected={this.state.selectedMonth === 7} value={7}>August</option>
-            <option selected={this.state.selectedMonth === 8} value={8}>September</option>
-            <option selected={this.state.selectedMonth === 9} value={9}>October</option>
-            <option selected={this.state.selectedMonth === 10} value={10}>November</option>
-            <option selected={this.state.selectedMonth === 11} value={11}>December</option>
-          </select>
-          <div>
-            <select id='category' className='create-budget-field category category-select' value={this.state.category} onChange={ e => this.eventHandler(e)}>
-              <option selected> -- filter by category -- </option>
-              {this.getCategories()}
+          <div className='chart-criteria-dropdown-container'>
+            <span>From</span>
+            <select onChange={ e => this.setSelectedMonth(e, 'fromMonth')} className='chart-month'>
+              <option selected={this.state.fromMonth === 0} value={0}>January</option>
+              <option selected={this.state.fromMonth === 1} value={1}>February</option>
+              <option selected={this.state.fromMonth === 2} value={2}>March</option>
+              <option selected={this.state.fromMonth === 3} value={3}>April</option>
+              <option selected={this.state.fromMonth === 4} value={4}>May</option>
+              <option selected={this.state.fromMonth === 5} value={5}>June</option>
+              <option selected={this.state.fromMonth === 6} value={6}>July</option>
+              <option selected={this.state.fromMonth === 7} value={7}>August</option>
+              <option selected={this.state.fromMonth === 8} value={8}>September</option>
+              <option selected={this.state.fromMonth === 9} value={9}>October</option>
+              <option selected={this.state.fromMonth === 10} value={10}>November</option>
+              <option selected={this.state.fromMonth === 11} value={11}>December</option>
             </select>
-            <select id='subCategory' className='create-budget-field category sub-category-select' value={this.state.subCategory} onChange={ e => this.eventHandler(e)}>
-              <option selected> -- filter by subcategory -- </option>
-              {this.getSubCategories()}
+          </div>
+          <div className='chart-criteria-dropdown-container'>
+            <span>Through</span>
+            <select onChange={ e => this.setSelectedMonth(e, 'throughMonth')} className='chart-month'>
+              <option selected={this.state.throughMonth === 0} value={0}>January</option>
+              <option selected={this.state.throughMonth === 1} value={1}>February</option>
+              <option selected={this.state.throughMonth === 2} value={2}>March</option>
+              <option selected={this.state.throughMonth === 3} value={3}>April</option>
+              <option selected={this.state.throughMonth === 4} value={4}>May</option>
+              <option selected={this.state.throughMonth === 5} value={5}>June</option>
+              <option selected={this.state.throughMonth === 6} value={6}>July</option>
+              <option selected={this.state.throughMonth === 7} value={7}>August</option>
+              <option selected={this.state.throughMonth === 8} value={8}>September</option>
+              <option selected={this.state.throughMonth === 9} value={9}>October</option>
+              <option selected={this.state.throughMonth === 10} value={10}>November</option>
+              <option selected={this.state.throughMonth === 11} value={11}>December</option>
             </select>
           </div>
         </div>
@@ -330,6 +351,20 @@ export default class Dashboard extends Component {
               maintainAspectRatio: false,
             }}
           />
+        </div>
+        <div className='chart-criteria-container'>
+          <div className='chart-criteria-dropdown-container'>
+            <select id='category' className='create-budget-field category category-select' value={this.state.category} onChange={ e => this.eventHandler(e)}>
+              <option selected>--filter category--</option>
+              {this.getCategories()}
+            </select>
+          </div>
+          <div className='chart-criteria-dropdown-container'>
+            <select id='subCategory' className='create-budget-field category sub-category-select' value={this.state.subCategory} onChange={ e => this.eventHandler(e)}>
+              <option selected>--filter subcategory--</option>
+              {this.getSubCategories()}
+            </select>
+          </div>
         </div>
         <div className='chart-container'>
           <Bar

@@ -131,7 +131,8 @@ export function initializeTransactions(transactionsInput = []) {
   let lastTransactionDate = transactions.length ? new Date(transactions[transactions.length -1].date) : new Date();
   let lastDayOfSelectedMonth = new Date(this.state.selectedYear, this.state.selectedMonth + 1, 0);
   // END DATE WILL EQUAL LAST TRANSACTION DATE OR LAST DAY OF SELECTED MONTH - WHICHEVER IS GREATER
-  let endDate = lastTransactionDate >= lastDayOfSelectedMonth ? new Date(lastTransactionDate) : new Date(lastDayOfSelectedMonth);
+  // let endDate = lastTransactionDate >= lastDayOfSelectedMonth ? new Date(lastTransactionDate) : new Date(lastDayOfSelectedMonth);
+  let endDate = new Date((new Date().getFullYear()), 11, 1); // ALWAYS THE LAST DAY OF THE YEAR
   let months = [];
 
   

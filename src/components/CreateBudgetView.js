@@ -7,6 +7,7 @@ import Header from './Header';
 import categories from './../helpers/categories';
 import currency from 'currency.js';
 import _ from 'lodash';
+import index from 'axios';
 
 const lables = {
   DAY: 'a Day',
@@ -38,8 +39,8 @@ export default class CreateBudgetView extends Component {
         name: '',
         amount: '',
         frequencyType: MONTH,
-        startDate: DateFunctions.formatDate(new Date()),
-        endDate: null,
+        startDate: '',
+        endDate: '',
         category: '',
         subCategory: '',
         frequencyDays: [],
@@ -50,13 +51,14 @@ export default class CreateBudgetView extends Component {
         name: '',
         amount: '',
         frequencyType: WEEK,
-        startDate: DateFunctions.formatDate(new Date()),
+        startDate: '',
         frequencyDays: []
       },
       balanceInfo: {
         date: new Date(),
         amount: 0,
       },
+      saveButtonIsDisabled: true
     }
     // ======================== BILL METHODS ===============================
     this.updateCurrentBillValues = this.updateCurrentBillValues.bind(this);
@@ -81,6 +83,7 @@ export default class CreateBudgetView extends Component {
     this.getSubCategories = this.getSubCategories.bind(this);
     //======================= BALANCE METHODS =================================
     this.updateCurrentBalanceValues = this.updateCurrentBalanceValues.bind(this);
+    this.handleScroll = this.handleScroll.bind(this);
   }
 
   componentDidMount() {
@@ -96,7 +99,7 @@ export default class CreateBudgetView extends Component {
               // CHECK IF THE BILL HAS ALREADY BEEN ADDED TO incomeSourcesWithFrequencies
               if(index === -1) {
                 // IF THE BILL IS NOT ALREADY IN THE ARRAY incomeSourcesWithFrequencies, ADD IT
-                incomeSourcesWithFrequencies.push({name, amount, frequencyType: frequency_type, start_date, frequencyDays: [day_num]});
+                incomeSourcesWithFrequencies.push({name, amount, frequencyType: frequency_type, startDate: DateFunctions.formatDate(new Date(start_date)), frequencyDays: [day_num]});
               } else {
                 // IF THE BILL IS ALREADY IN THE ARRAY, JUST ADD THE day_num TO THE frequencyDays FOR THAT BILL.
                 incomeSourcesWithFrequencies[index].frequencyDays.push(day_num);
@@ -111,7 +114,7 @@ export default class CreateBudgetView extends Component {
               // CHECK IF THE BILL HAS ALREADY BEEN ADDED TO billsWithFrequencies
               if(index === -1) {
                 // IF THE BILL IS NOT ALREADY IN THE ARRAY billsWithFrequencies, ADD IT
-                billsWithFrequencies.push({name, amount, frequencyType: frequency_type, start_date, end_date, category, subCategory: sub_category, frequencyDays: [day_num]});
+                billsWithFrequencies.push({name, amount, frequencyType: frequency_type, startDate: DateFunctions.formatDate(new Date(start_date)), endDate: end_date, category, subCategory: sub_category, frequencyDays: [day_num]});
               } else {
                 // IF THE BILL IS ALREADY IN THE ARRAY, JUST ADD THE day_num TO THE frequencyDays FOR THAT BILL.
                 billsWithFrequencies[index].frequencyDays.push(day_num);
@@ -119,6 +122,8 @@ export default class CreateBudgetView extends Component {
             }
             let balanceData = balanceInfo.data;
             balanceData.date = DateFunctions.formatDate(new Date(balanceData.date));
+            
+            window.addEventListener('scroll', this.handleScroll);
 
             this.setState({
               bills: billsWithFrequencies,
@@ -135,35 +140,61 @@ export default class CreateBudgetView extends Component {
       this.props.history.push('/');
     });
   }
-  
+  componentWillUnmount() {
+    window.removeEventListener('scroll', this.handleScroll);
+  }
+
+  enableSaveBudgetButton() {
+    // ENABLE THE SAVE BUDGET BUTTON
+    this.setState({
+      saveButtonIsDisabled: false
+    })
+  }
+  handleScroll(event) {
+    let scrollTop = event.srcElement.body.scrollTop,
+      itemTranslate = Math.min(0, scrollTop/3 - 60);
+    let buttonContainer = document.getElementById('save-budget-button');
+    let containerClassList = buttonContainer.className.split(' ');
+    let index = containerClassList.indexOf('sticky-container');
+
+    if(window.pageYOffset > 85) {
+      if(index === -1) {
+        containerClassList.push('sticky-container');
+        buttonContainer.className = containerClassList.join(' ');
+      }
+    } else {
+      if(index !== -1) {
+        containerClassList.splice(index, 1);
+        buttonContainer.className = containerClassList.join(' ');
+      }
+    }
+  }
+
   getCurrentBillDefaults() {
-    let d = new Date();
-    let today = DateFunctions.formatDate(d);
     return {
-        name: '',
-        amount: 0,
-        frequencyType: MONTH,
-        startDate: today,
-        endDate: null,
-        category: '',
-        subCategory: '',
-        frequencyDays: [],
+      name: '',
+      amount: 0,
+      frequencyType: MONTH,
+      startDate: null,
+      endDate: null,
+      category: '',
+      subCategory: '',
+      frequencyDays: [],
     }
   }
 
   getCurrentIncomeDefaults() {
-    let d = new Date();
-    let today = DateFunctions.formatDate(d);
     return {
         name: '',
         amount: 0,
         frequencyType: WEEK,
-        startDate: today,
+        startDate: null,
         frequencyDays: [],
     }
   }
 
   saveBudgetTemplate() {
+    console.log('clicked');
     axios.get('/api/user-data').then( userInfo => {
       axios.post('/api/balance', { ...this.state.balanceInfo }).then( response => {
         console.log('post bills successful');
@@ -180,6 +211,11 @@ export default class CreateBudgetView extends Component {
           console.log('post income successful');
         }).catch( err => console.log('createbudgetview.js - error posting income: ', err));
       }
+
+      this.setState({
+        saveButtonIsDisabled: true
+      });
+
     }).catch( err => {
       console.log('createbudgetview.js(saveBudgetTemplate) get user-data err: ', err);
       this.props.history.push('/');
@@ -199,7 +235,7 @@ export default class CreateBudgetView extends Component {
     if(prop === 'frequencyType') {
       currentBillCopy.frequencyDays = []
     }
-
+    this.enableSaveBudgetButton();
     this.setState({ currentBill: currentBillCopy });
   }
   updateCurrentIncomeValues(e) {
@@ -214,7 +250,7 @@ export default class CreateBudgetView extends Component {
     if(prop === 'frequencyType') {
       currentIncomeSourceCopy.frequencyDays = []
     }
-
+    this.enableSaveBudgetButton();
     this.setState({ currentIncomeSource: currentIncomeSourceCopy });
   }
   updateCurrentBalanceValues(e) {
@@ -222,6 +258,7 @@ export default class CreateBudgetView extends Component {
     let prop = e.target.id.replace('balance-', '');
     let val = prop === 'amount' ? currency(e.target.value).value : new Date(e.target.value);
     balanceInfo[prop] = e.target.value;
+    this.enableSaveBudgetButton();
     this.setState({ balanceInfo });
   }
 
@@ -263,7 +300,7 @@ export default class CreateBudgetView extends Component {
     if(this.state.bills.length) {
       let bills = this.state.bills.map( (bill, index) => {
         return (
-          <option id={'bill_' + index} onClick={ e => this.changeCurrentBill(e.target.id)}>{bill.name}</option>
+          <option value={'bill_' + index}>{bill.name}</option>
         )
       })
       return bills;
@@ -274,7 +311,7 @@ export default class CreateBudgetView extends Component {
     if(this.state.incomeSources.length) {
       let incomeSources = this.state.incomeSources.map( (incomeSource, index) => {
         return (
-          <option id={'incomeSource_' + index} onClick={ e => this.changeCurrentIncomeSource(e.target.id)}>{incomeSource.name}</option>
+          <option value={'incomeSource_' + index}>{incomeSource.name}</option>
         )
       })
       return incomeSources;
@@ -324,20 +361,22 @@ export default class CreateBudgetView extends Component {
     let currentIncomeSourceCopy = { ...this.state.currentIncomeSource };
 
     const { name, amount, frequencyDays, frequencyType, startDate } = currentIncomeSourceCopy;
-    switch('') {
-      case name:
-        window.alert('Each Income Source must have a Name, and it must be unique!');
-        document.getElementById('income-name').focus();
-        return;
-      case amount:
-        window.alert('Each Income Source must have an Amount!');
-        document.getElementById('income-amount').focus();
-        return;
-      case startDate:
-        window.alert('Each Income Source must have a Start Date!');
-        document.getElementById('income-startDate').focus();
-      default: break;
+    if(name === '') {
+      window.alert('Each Income Source must have a Name, and it must be unique!');
+      document.getElementById('income-name').focus();
+      return;
     }
+    if(amount === '' || amount === 0) {
+      window.alert('Each Income Source must have an Amount!');
+      document.getElementById('income-amount').focus();
+      return;
+    }
+    if(startDate === null) {
+      window.alert('Each Income Source must have a Start Date!');
+      document.getElementById('income-startDate').focus();
+      return;
+    }
+      
     if(!frequencyDays.length && (frequencyType === WEEK || frequencyType === MONTH)) {
           window.alert('Please select at least 1 day for the frequency!');
           document.getElementById('income-selector').focus();
@@ -362,11 +401,13 @@ export default class CreateBudgetView extends Component {
     if(currentBillCopy.hasOwnProperty('id')) {
       let updatedBills = this.state.bills.slice();
       updatedBills.splice(currentBillCopy.id, 1);
+      this.enableSaveBudgetButton();
       this.setState({
         currentBill: this.getCurrentBillDefaults(),
         bills: updatedBills,
       });
     } else {
+      this.enableSaveBudgetButton();
       this.setState({
         currentBill: this.getCurrentBillDefaults(),
       });
@@ -378,11 +419,13 @@ export default class CreateBudgetView extends Component {
     if(currentIncomeSourceCopy.hasOwnProperty('id')) {
       let updatedIncomeSources = this.state.incomeSources.slice();
       updatedIncomeSources.splice(currentIncomeSourceCopy.id, 1);
+      this.enableSaveBudgetButton();
       this.setState({
         currentIncomeSource: this.getCurrentIncomeDefaults(),
         incomeSources: updatedIncomeSources,
       });
     } else {
+      this.enableSaveBudgetButton();
       this.setState({
         currentIncomeSource: this.getCurrentIncomeDefaults(),
       });
@@ -412,7 +455,9 @@ export default class CreateBudgetView extends Component {
     } else {
       currentBillCopy.frequencyDays[0] = target.value;
     }
-
+    // ENABLE THE SAVE BUDGET BUTTON
+    let buttonContainer = document.getElementById('save-budget-button');
+    buttonContainer.disabled = false;
     this.setState({
       currentBill: currentBillCopy
     })
@@ -429,6 +474,9 @@ export default class CreateBudgetView extends Component {
     } else {
       currentIncomeSourceCopy.frequencyDays[0] = target.value;
     }
+    // ENABLE THE SAVE BUDGET BUTTON
+    let buttonContainer = document.getElementById('save-budget-button');
+    buttonContainer.disabled = false;
     this.setState({
       currentIncomeSource: currentIncomeSourceCopy
     })
@@ -490,10 +538,10 @@ export default class CreateBudgetView extends Component {
       <div className='create-budget-component'>
       <Header />
         <div className='create-budget-title'>
-          <h1>Create A New Budget</h1>
+          <h1>My Budget Template</h1>
         </div>
-        <div>
-        <button onClick={this.saveBudgetTemplate}>Save Budget Template</button>
+        <div id='save-budget-button-container' className='save-budget-button-container'>
+          <button id='save-budget-button' className='save-budget-button' disabled={this.state.saveButtonIsDisabled} onClick={this.saveBudgetTemplate}>Save Budget Template</button>
         </div>
         <div className='balance-entry-container entry-container'>
           <h2>Starting Balance</h2>
@@ -541,7 +589,7 @@ export default class CreateBudgetView extends Component {
             </div>
             <div className='income-list-container list-container'>
               <label htmlFor='income-list'>Income List</label>
-              <select id='income-list' className='income-list budget-list' size={1 + this.state.incomeSources.length}>
+              <select id='income-list' className='income-list budget-list' size={1 + this.state.incomeSources.length} onChange={e => this.changeCurrentIncomeSource(e.target.value)} onClick={e => this.changeCurrentIncomeSource(e.target.value)}>
                 {incomeSources && incomeSources}
               </select>
             </div>
@@ -597,7 +645,7 @@ export default class CreateBudgetView extends Component {
             </div>
             <div className='bills-list-container list-container'>
               <label htmlFor='bill-list'>Bill List</label>
-              <select id='bill-list' className='bills-list budget-list' size={1 + this.state.bills.length}>
+              <select id='bill-list' className='bills-list budget-list' size={1 + this.state.bills.length}  onChange={e => this.changeCurrentBill(e.target.value)} onClick={e => this.changeCurrentBill(e.target.value)}>
                 {bills && bills}
               </select>
             </div>
