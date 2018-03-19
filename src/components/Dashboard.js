@@ -9,6 +9,7 @@ import categories from '../helpers/categories';
 import _ from 'lodash';
 import DateFunctions from '../helpers/DateFunctions';
 
+const colors = ['#0973B3','#2AD705','#FF8E00','#ED003B','#00BA78','#5AE500','#C44464','#1E18BF','#FFC200','#CA0092','#B6F400']
 const monthNames =  ["January", "February", "March", "April", "May", "June", "July", "August", "September", "October", "November", "December"];
 Date.prototype.isSameDateAs = function(pDate) {
   return (
@@ -49,6 +50,7 @@ export default class Dashboard extends Component {
     this.getSubCategories = this.getSubCategories.bind(this);
     this.eventHandler = this.eventHandler.bind(this);
     this.getChartData = this.getChartData.bind(this);
+    this.getChartDataByCategory = this.getChartDataByCategory.bind(this);
     this.showNextXBills = this.showNextXBills.bind(this);
   }
   
@@ -108,8 +110,59 @@ export default class Dashboard extends Component {
         }
       ]
     }
-
     return chartData;
+  }
+  
+  getChartDataByCategory() {
+    let months = monthNames.slice();
+    let labels = months.splice(0, parseInt(this.state.selectedMonth) + 1);
+
+    let expenseData = [];
+    let datasets = [];
+    if(this.state.fullTransactionSet) {
+      let allMonths = this.state.fullTransactionSet.slice();
+      allMonths = allMonths.filter( transaction => {
+        let monthNum = transaction.day.getMonth();
+        let year = transaction.day.getFullYear();
+        return monthNum >= 0 && monthNum <= this.state.selectedMonth && year === this.state.selectedYear && transaction.category;
+      });
+      let usedCategories = allMonths.map(transaction => transaction.category);
+      let objCategories = new Set( usedCategories );
+      let uniqueCategories = Array.from(objCategories);
+
+      for(let i = 0; i < uniqueCategories.length; i++) {
+        datasets.push({
+          label: uniqueCategories[i],
+          data: [],
+          backgroundColor: colors[i],
+        })
+        for(let j = 0; j <= this.state.selectedMonth; j++) {
+          datasets[i].data.push(0);
+        }
+      }
+      
+      for(let i = 0; i <= this.state.selectedMonth; i++) {
+        let fullTransactionSet = this.state.fullTransactionSet.slice();
+        let monthTransactions = fullTransactionSet.filter( transaction => transaction.day.getMonth() === i && transaction.day.getFullYear() === this.state.selectedYear && transaction.category);
+        monthTransactions.map( transaction => {
+          let index = datasets.findIndex(dataset => dataset.label === transaction.category);
+          if(index !== -1) {
+            datasets[index].data[i] = currency(datasets[index].data[i]).add(Math.abs(transaction.amount)).value;
+          } else {
+            datasets.push({
+              label: transaction.category,
+              data: []
+            });
+
+          }
+        })
+      }
+      let chartData = {
+        labels: labels,
+        datasets
+      }
+      return chartData;
+    }
   }
   
   setSelectedMonth(e) {
@@ -253,7 +306,7 @@ export default class Dashboard extends Component {
             <option selected={this.state.selectedMonth === 5} value={5}>June</option>
             <option selected={this.state.selectedMonth === 6} value={6}>July</option>
             <option selected={this.state.selectedMonth === 7} value={7}>August</option>
-            <option selected={this.state.selectedMonth === 8} value={8}>Septempber</option>
+            <option selected={this.state.selectedMonth === 8} value={8}>September</option>
             <option selected={this.state.selectedMonth === 9} value={9}>October</option>
             <option selected={this.state.selectedMonth === 10} value={10}>November</option>
             <option selected={this.state.selectedMonth === 11} value={11}>December</option>
@@ -273,6 +326,15 @@ export default class Dashboard extends Component {
           <Bar
             width={90}
             data={this.getChartData()}
+            options={{
+              maintainAspectRatio: false,
+            }}
+          />
+        </div>
+        <div className='chart-container'>
+          <Bar
+            width={90}
+            data={this.getChartDataByCategory()}
             options={{
               maintainAspectRatio: false,
             }}

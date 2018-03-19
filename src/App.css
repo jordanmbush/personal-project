@@ -3,7 +3,9 @@ hr {
   margin: auto;
   /* height: 2px; */
 }
-
+select {
+  background-color: white;
+}
 button {
   border: none;
   margin: 1px;
@@ -272,7 +274,11 @@ small {
 
 .add-transactions-header h1 {
   text-align: center;
-  font-family: 'Lucida Sans', 'Lucida Sans Regular', 'Lucida Grande', 'Lucida Sans Unicode', Geneva, Verdana, sans-serif;
+  font-family: monospace;
+  color: white;
+  background-color: #0973B3;
+  border: 3px solid black;
+  border-radius: 5px;
 }
 
 .month-navigation-buttons-container {
@@ -334,7 +340,7 @@ small {
   padding: 5px;
 }
 
-.transaction-table-daily-header-row:hover {
+.transaction-table-daily-header-row:active {
   transform: scale(1.02);
 }
 
@@ -374,6 +380,7 @@ small {
   text-decoration-line: underline;
   border-radius: 5px;
   border: 2px solid #0973B3;
+  box-sizing: border-box;
 }
 .transaction-info {
   display: flex;
@@ -386,7 +393,8 @@ small {
   font-size: 15px;
   font-weight: bold;
   overflow: hidden;
-  margin: 0;
+  margin: 2.5px;
+  /* box-sizing: border-box; */
 }
 .transaction-info > div > input {
   width: 100%;
@@ -396,7 +404,9 @@ small {
   padding: 5px;
   box-sizing: border-box;
 }
-
+.transaction-buttons-container {
+  animation: buttonsSlideDown .5s;
+}
 .transaction-buttons-container > * {
   font-size: 15px;
   flex: 1;
@@ -406,6 +416,19 @@ small {
   border-radius: 5px;
   justify-content: center;
   font-weight: bold;
+  padding: 7px;
+}
+.transaction-buttons-container > button {
+  background-color: white;
+  color: black;
+  border: 2px solid black;
+}
+.transaction-buttons-container > .delete-button {
+  color: red;
+}
+.transaction-buttons-container > button:active {
+  background-color: black;
+  color: white;
 }
 .transaction-buttons-container > * > * {
   flex: 1;
@@ -440,7 +463,6 @@ small {
 .transaction-table-entry-container > .entry-row > .entry-field > * {
   width: 100%;
 }
-
 .transaction-table-entry-container input, .transaction-table-entry-container select {
   border: 1px solid grey;
   border-radius: 5px;
@@ -454,48 +476,16 @@ small {
   background-color: #0973B3;
   color: white;
 }
-.banded-true:hover {
+.banded-true:active {
   background-color: rgb(66, 154, 209);
 }
 .banded-false {
   background-color: whitesmoke;
 }
-.banded-false:hover {
+.banded-false:active {
   background-color: rgb(206, 206, 206);
 }
 
-.toggle-transactions-button-show {
-  display: none;
-  width: 25px;
-  height: 25px;
-  line-height: 25px;
-  border-radius: 50%;
-  border: none;
-  background-color: #2AD705;
-  color: white;
-  text-align: center;
-  vertical-align: middle;
-  font-weight: bold;
-  font-size: 20px;
-  margin-top: auto;
-  margin-bottom: auto;
-}
-
-.toggle-transactions-button-hide {
-  width: 35px;
-  height: 25px;
-  line-height: 15px;
-  border-radius: 5px;
-  border: none;
-  background-color: rgb(220, 243, 11);
-  color: white;
-  text-align: center;
-  vertical-align: middle;
-  font-weight: bold;
-  font-size: 25px;
-  margin-top: auto;
-  margin-bottom: auto;
-}
 .show-entry-fields-button-container {
   display: flex;
   justify-content: center;
@@ -678,7 +668,7 @@ small {
 .chart-container {
   background-color: white;
   width: 90%;
-  margin: auto;
+  margin: 0 auto 20px auto;
   border-radius: 10px;
   border: 3px solid #0973B3;
 }
@@ -868,6 +858,15 @@ small {
   .month-navigation-buttons-container button {
     min-width: 100px;
   }
+  .transaction-table-daily-header-row:hover {
+    transform: scale(1.02);
+  }
+  .banded-true:hover {
+    background-color: rgb(66, 154, 209);
+  }
+  .banded-false:hover {
+    background-color: rgb(206, 206, 206);
+  }
   .entry-container {
     width: 70%;
   }
@@ -905,6 +904,10 @@ small {
   #panel-4 > * {
     width: 40%;
     margin: auto;
+  }
+  .transaction-buttons-container > button:hover {
+    background-color: black;
+    color: white;
   }
 }
 
@@ -954,3 +957,22 @@ small {
     border-radius: 5px;
   }
 }
+
+@keyframes buttonsSlideDown {
+  from { height: 0; overflow: hidden }
+  to { height: 40px; overflow: hidden }
+}
+
+/* .class {
+  color: #0973B3;
+  color: #2AD705;
+  color: #FF8E00;
+  color: #ED003B;
+  color: #00BA78;
+  color: #5AE500;
+  color: #C44464;
+  color: #1E18BF;
+  color: #FFC200;
+  color: #CA0092;
+  color: #B6F400;
+} */

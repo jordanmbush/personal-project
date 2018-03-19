@@ -7,6 +7,7 @@ import { getTransactionsFromDB, getEOWTransactionsFromTemplate, getMonthlyTransa
 import categories from '../helpers/categories';
 import _ from 'lodash';
 
+const monthNames =  ["January", "February", "March", "April", "May", "June", "July", "August", "September", "October", "November", "December"];
 const DAY = 'DAY';
 const WEEK = 'WEEK';
 const MONTH = 'MONTH';
@@ -48,6 +49,7 @@ export default class AddTransactionsView extends Component {
     this.populateTransactionsByMonth = this.populateTransactionsByMonth.bind(this);
     this.toggleTableRowVisibility = this.toggleTableRowVisibility.bind(this);
     this.toggleEditSaveTransactionButton = this.toggleEditSaveTransactionButton.bind(this);
+    this.toggleRowButtonsVisibility = this.toggleRowButtonsVisibility.bind(this);
     this.addTransaction = this.addTransaction.bind(this);
     this.saveTransaction = this.saveTransaction.bind(this);
     this.deleteTransaction = this.deleteTransaction.bind(this);
@@ -255,19 +257,19 @@ export default class AddTransactionsView extends Component {
 
         balance = billsForDay[i].balance;
         dailyTotal = currency(amount).add(dailyTotal).value;
-        const deleteTransactionButton = <button data-is-transaction={id || false} data-index={formattedTransactionKey} id={`${currentMonthTransactionKey}-delete-button`} onClick={(e) => this.deleteTransaction(e.currentTarget)}><i className="fas fa-trash-alt"></i></button>
-        const editTransactionButton = <button data-is-transaction={id || false} data-index={formattedTransactionKey} id={`${currentMonthTransactionKey}-edit-button`} onClick={(e) => this.toggleEditSaveTransactionButton(e.currentTarget)}>Edit</button>
+        const deleteTransactionButton = <button data-is-transaction={id || false} data-index={formattedTransactionKey} id={`${currentMonthTransactionKey}-delete-button`} onClick={(e) => this.deleteTransaction(e.currentTarget)} className='delete-button'><i className="fas fa-trash-alt"></i></button>
+        const editTransactionButton = <button data-is-transaction={id || false} data-index={formattedTransactionKey} id={`${currentMonthTransactionKey}-edit-button`} onClick={(e) => this.toggleEditSaveTransactionButton(e.currentTarget)} className='edit-button'>Edit</button>
 
         dailyTransactions.push(
           <div className='transaction-table-row' id={`${dayID}-${i}`}>
-            <div className='transaction-info'>
+            <div className='transaction-info' onClick={() => this.toggleRowButtonsVisibility(`${dayID}-${i}`)}>
                 <div><input disabled id={`${currentMonthTransactionKey}-balance`} className='transaction-balance' onChange={e => this.updateTransactionValues(e)} value={currency(this.state.currentMonthTransactions[currentMonthTransactionKey].balance).format(true)}></input></div>
                 <div><input disabled id={`${currentMonthTransactionKey}-name`} className='transaction-name' onChange={e => this.updateTransactionValues(e)} value={this.state.currentMonthTransactions[currentMonthTransactionKey].name}></input></div>
                 <div><input disabled id={`${currentMonthTransactionKey}-amount`} className='transaction-amount' onChange={e => this.updateTransactionValues(e)} value={currency(this.state.currentMonthTransactions[currentMonthTransactionKey].amount).value} type='number'></input></div>
                 <div><input disabled id={`${currentMonthTransactionKey}-category`} className='transaction-category' onChange={e => this.updateTransactionValues(e)} value={this.state.currentMonthTransactions[currentMonthTransactionKey].category}></input></div>
                 <div><input disabled id={`${currentMonthTransactionKey}-subCategory`} className='transaction-subcCategory' onChange={e => this.updateTransactionValues(e)} value={this.state.currentMonthTransactions[currentMonthTransactionKey].subCategory}></input></div>
             </div>
-            <div className='transaction-buttons-container'>
+            <div id={`${dayID}-${i}-buttons`} className='transaction-buttons-container row-hidden'>
               <div className='income-radio radio-container'>
                 <label htmlFor={currentMonthTransactionKey + '-radio-income'}><i class="far fa-money-bill-alt"></i></label>
                 <input disabled id={`${currentMonthTransactionKey}-radio-income`}  type='radio' name={`${currentMonthTransactionKey}-transaction-type`} onChange={(e) => this.updateTransactionValues(e)} checked={this.state.currentMonthTransactions[currentMonthTransactionKey].transactionType === 'income'}></input>
@@ -410,6 +412,7 @@ export default class AddTransactionsView extends Component {
     document.getElementById(id + '-name').disabled = isDisabled;
     document.getElementById(id + '-amount').disabled = isDisabled;
     document.getElementById(id + '-category').disabled = isDisabled;
+    document.getElementById(id + '-subCategory').disabled = isDisabled;
     document.getElementById(id + '-radio-income').disabled = isDisabled;
     document.getElementById(id + '-radio-expense').disabled = isDisabled;
 
@@ -431,6 +434,7 @@ export default class AddTransactionsView extends Component {
         name: monthlyTransaction.name,
         amount: Math.abs(currency(monthlyTransaction.amount).value),
         category: monthlyTransaction.category,
+        subCategory: monthlyTransaction.subCategory,
         type: monthlyTransaction.transactionType,
         date: monthlyTransaction.day,
         id: monthlyTransaction.id
@@ -581,12 +585,25 @@ export default class AddTransactionsView extends Component {
       toggleButton.className = 'show-fields'
     }
   }
+  toggleRowButtonsVisibility(dayID) {
+    let buttonContainer = document.getElementById(dayID + '-buttons');
+    let buttonContainerClassList = buttonContainer.className.split(' ');
+
+    let index = buttonContainerClassList.indexOf('row-hidden');
+    
+    if(index !== -1) {
+      buttonContainerClassList.splice(buttonContainerClassList.indexOf('row-hidden'),1)
+      buttonContainer.className = buttonContainerClassList.join(' ');
+    } else {
+      buttonContainerClassList.push('row-hidden');
+      buttonContainer.className = buttonContainerClassList.join(' ');
+    }
+  }
   
   render() {
-    
     let transactions = this.populateTransactionsByMonth();
-    let dateArr = (new Date(this.state.selectedYear, this.state.selectedMonth)).toDateString().split(' ');
-    let monthYearHeader = dateArr[1] + ' ' + dateArr[3];
+    let monthYearHeader = `${monthNames[this.state.selectedMonth]} ${this.state.selectedYear}`
+
     return (
       <div className='add-transactions-component'>
         <Header />
