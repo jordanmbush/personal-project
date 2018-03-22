@@ -617,7 +617,9 @@ export default class CreateBudgetView extends Component {
               <option value={XDAYS}>{dayAdjectives.XDAYS}</option>
             </select>
           </div>
-          {expenseDaySelector && expenseDaySelector}
+          <div>
+            {expenseDaySelector && expenseDaySelector}
+          </div>
           <div>
             <label>Start Date</label>
             <input id='bill-startDate' type='date' className='create-budget-field' value={this.state.currentBill.startDate} onChange={ e => this.updateCurrentBillValues(e)}></input>

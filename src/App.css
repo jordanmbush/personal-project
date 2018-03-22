@@ -9,6 +9,7 @@ select {
 button {
   border: none;
   margin: 1px;
+  outline: 0;
 }
 button:hover {
   cursor: pointer;
