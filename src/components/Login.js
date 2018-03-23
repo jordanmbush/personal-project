@@ -56,10 +56,10 @@ export default class Login extends Component {
           <div className='panel-content'>
             <h2>50% of Americans have less than one month's income saved!</h2>
             <div className='panel-main-info'>
-              <img src='http://ak3.picdn.net/shutterstock/videos/9802973/thumb/1.jpg' alt='Savings Jar with a few coins'></img>
+              <img src='https://ak3.picdn.net/shutterstock/videos/9802973/thumb/1.jpg' alt='Savings Jar with a few coins'></img>
               <p>Top personal finance advisors will tell you - and especially drawing from lessons in the economic crisis to have at least six months income saved, just in case.</p>
             </div>
-            <aside><a href='http://www.businessinsider.com/a-dozen-shocking-personal-finance-statistics-2011-5'>www.businessinsider.com</a></aside>
+            <aside><a href='https://www.businessinsider.com/a-dozen-shocking-personal-finance-statistics-2011-5'>www.businessinsider.com</a></aside>
           </div>
         </div>
         <div id='panel-2' className='panel'>
@@ -78,30 +78,30 @@ export default class Login extends Component {
                 </ul>
               </div>
             </div>
-            <aside><a href='http://www.businessinsider.com/a-dozen-shocking-personal-finance-statistics-2011-5'>www.businessinsider.com</a></aside>
+            <aside><a href='https://www.businessinsider.com/a-dozen-shocking-personal-finance-statistics-2011-5'>www.businessinsider.com</a></aside>
           </div>
         </div>
         <div id='panel-3' className='panel'>
           <div className='panel-content'>
             <h2>The number of people who actually budget is shocking!</h2>
             <div className='panel-main-info'>
-              <img src='http://www.moneymanagement.org/~/media/budgeting.jpg' alt='Hand written budget'></img>
+              <img src='https://www.moneymanagement.org/~/media/budgeting.jpg' alt='Hand written budget'></img>
               <ul>
                 <li>Only 30% of Americans have a long-term financial plan that includes savings and investment goals</li>
                 <li>You’re mostly likely to budget if you make at least $75,000 per year</li>
               </ul>
             </div>
-            <aside><a href='http://www.gallup.com/poll/162872/one-three-americans-prepare-detailed-household-budget.aspx'>news.gallup.com</a></aside>
+            <aside><a href='https://www.gallup.com/poll/162872/one-three-americans-prepare-detailed-household-budget.aspx'>news.gallup.com</a></aside>
           </div>
         </div>
         <div id='panel-4' className='panel'>
           <div className='panel-content'>
             <h2>50% of Americans have less than one month's income saved!</h2>
             <div className='panel-main-info'>
-              <img src='http://ak3.picdn.net/shutterstock/videos/9802973/thumb/1.jpg' alt='Savings Jar with a few coins'></img>
+              <img src='https://ak3.picdn.net/shutterstock/videos/9802973/thumb/1.jpg' alt='Savings Jar with a few coins'></img>
               <p>Top personal finance advisors will tell you - and especially drawing from lessons in the economic crisis to have at least six months income saved, just in case.</p>
             </div>
-            <aside><a href='http://www.businessinsider.com/a-dozen-shocking-personal-finance-statistics-2011-5'>www.businessinsider.com</a></aside>
+            <aside><a href='https://www.businessinsider.com/a-dozen-shocking-personal-finance-statistics-2011-5'>www.businessinsider.com</a></aside>
           </div>
         </div>
       </div>
