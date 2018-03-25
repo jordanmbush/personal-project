@@ -1,15 +1,16 @@
 const axios = require('axios');
+require('dotenv').config();
 
 module.exports = {
   connect: (req, res) => {
     const authorizationCode = req.query.code;
-    
+    const HTTP = process.env.NODE_ENV === 'production' ? 'https' : 'http';
     axios.post(`https://${process.env.REACT_APP_AUTH_DOMAIN}/oauth/token`, {
       client_id: process.env.REACT_APP_AUTH_CLIENT_ID,
       client_secret: process.env.AUTH_CLIENT_SECRET,
       code: authorizationCode,
       grant_type: 'authorization_code',
-      redirect_uri: `http://${req.headers.host}/auth/callback`
+      redirect_uri: `${HTTP}://${req.headers.host}/auth/callback`
     }).then( accessToken => {
       return axios.get(`https://${process.env.REACT_APP_AUTH_DOMAIN}/userinfo/?access_token=${accessToken.data.access_token}`).then( userInfo => {
         const { sub, name, email } = userInfo.data;

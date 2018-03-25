@@ -54,10 +54,12 @@ app.get('/api/balance', checkSession, balance_controller.getBalance);
 app.post('/api/logout', checkSession, user_controller.logout);
 
 // ==============================================================
-// const path = require('path')
-// app.get('*', (req, res)=>{
-//   res.sendFile(path.join(__dirname, '../build/index.html'));
-// })
+if(process.env.NODE_ENV === 'production') {
+  const path = require('path')
+  app.get('*', (req, res)=>{
+    res.sendFile(path.join(__dirname, '../build/index.html'));
+  });
+}
 
 const PORT = 4000;
 app.listen( PORT, console.log(`Listening on port ${PORT}.`));
