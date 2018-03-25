@@ -131,14 +131,18 @@ export default class Dashboard extends Component {
       
       let uniqueCategories = [];
       let catType = '';
-      if(this.state.subCategory !== '--filter subcategory--') {
-        uniqueCategories.push(this.state.subCategory)
-        catType = 'subCategory';
-      } else if(this.state.category !== '--filter category--') { //IF THERE IS A SUBCATEGORY IN STATE
-        let usedSubCategories = allMonths.map(transaction => transaction.subCategory);
+      // IF A CATEGORY HAS BEEN CHOSEN
+      if(this.state.category !== '--filter category--') {
+        let usedSubCategories = allMonths.map(transaction => {
+          if(transaction.category === this.state.category) {
+            return transaction.subCategory;
+          }
+        });
+        // GET A UNIQUE LIST OF ALL SUBCATEGORIES
         let objSubCategories = new Set( usedSubCategories );
         uniqueCategories = Array.from(objSubCategories);
         catType = 'subCategory';
+      // SHOW CHART DATA BY CATEGORY INSTEAD OF SUBCATEGORIES
       } else {
         let usedCategories = allMonths.map(transaction => transaction.category);
         let objCategories = new Set( usedCategories );
@@ -146,17 +150,21 @@ export default class Dashboard extends Component {
         catType = 'category';
       }
 
+      // FOR EACH CATEGORY/SUBCATEGORY - CREATE A DATASET
       for(let i = 0; i < uniqueCategories.length; i++) {
         datasets.push({
           label: uniqueCategories[i],
           data: [],
           backgroundColor: colors[i],
         })
+        // FOR EACH DATASET - ENTER 0 FOR EVERY MONTH. IF THERE ARE NO TRANSACTIONS FOR THAT MONTH
+        // THE CHART WILL SHOW 0
         for(let j = 0; j <= this.state.fromMonth; j++) {
           datasets[i].data.push(0);
         }
       }
       
+      // ADD TRANSACTION DATA TO DATASETS
       for(let i = this.state.fromMonth; i <= this.state.throughMonth; i++) {
         let fullTransactionSet = this.state.fullTransactionSet.slice();
         let monthTransactions = fullTransactionSet.filter( transaction => transaction.day.getMonth() === i && transaction.day.getFullYear() === this.state.selectedYear && transaction.category);
@@ -357,12 +365,6 @@ export default class Dashboard extends Component {
             <select id='category' className='create-budget-field category category-select' value={this.state.category} onChange={ e => this.eventHandler(e)}>
               <option selected>--filter category--</option>
               {this.getCategories()}
-            </select>
-          </div>
-          <div className='chart-criteria-dropdown-container'>
-            <select id='subCategory' className='create-budget-field category sub-category-select' value={this.state.subCategory} onChange={ e => this.eventHandler(e)}>
-              <option selected>--filter subcategory--</option>
-              {this.getSubCategories()}
             </select>
           </div>
         </div>
