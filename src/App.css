@@ -39,6 +39,14 @@ small {
 ======================== HEADER COMPONENT =======================
 =================================================================
  */
+ .admin-dashboard-component {
+   height: 100vh;
+ }
+/* 
+=================================================================
+======================== HEADER COMPONENT =======================
+=================================================================
+ */
 
 .add-transactions-component {
   /* background-color: rgb(226, 226, 226); */
@@ -115,6 +123,12 @@ small {
   width: 100vw;
   background-color: #5AE500;
   z-index: 2;
+}
+.login-component input {
+  margin: 5px;
+  border-radius: 5px;
+  border: 1px solid grey;
+  padding: 5px;
 }
 
 .hero-panel {

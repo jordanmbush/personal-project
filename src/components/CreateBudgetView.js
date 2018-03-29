@@ -200,17 +200,17 @@ export default class CreateBudgetView extends Component {
         console.log('post bills successful');
       }).catch( err => console.log('createbudgetview.js - error posting balance: ', err));
 
-      if(this.state.bills.length) {
+      // if(this.state.bills.length) {
         axios.post('/api/bills', { bills: this.state.bills }).then( response => {
           console.log('post bills successful');
         }).catch( err => console.log('createbudgetview.js - error posting bills: ', err));
-      }
+      // }
 
-      if(this.state.incomeSources.length) {
+      // if(this.state.incomeSources.length) {
         axios.post('/api/income', { income: this.state.incomeSources }).then( response => {
           console.log('post income successful');
         }).catch( err => console.log('createbudgetview.js - error posting income: ', err));
-      }
+      // }
 
       this.setState({
         saveButtonIsDisabled: true

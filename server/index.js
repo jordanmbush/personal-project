@@ -7,10 +7,12 @@ const bill_controller = require('./controllers/bill_controller');
 const transaction_controller = require('./controllers/transaction_controller');
 const income_controller = require('./controllers/income_controller');
 const balance_controller = require('./controllers/balance_controller');
+const admin_controller = require('./controllers/admin_controller');
 // MIDDLEWARES
 const session = require('express-session');
 const bodyParser = require('body-parser');
 const checkSession = require('./middlewares/checkSession');
+const checkAdminSession = require('./middlewares/checkAdminSession');
 
 require('dotenv').config();
 
@@ -51,7 +53,12 @@ app.delete('/api/transaction/:id', checkSession, transaction_controller.deleteTr
 app.post('/api/balance', checkSession, balance_controller.addBalance);
 app.get('/api/balance', checkSession, balance_controller.getBalance);
 
-app.post('/api/logout', checkSession, user_controller.logout);
+app.post('/api/logout', user_controller.logout);
+
+app.post('/api/admin-login', admin_controller.login);
+app.get('/api/admin-data', checkAdminSession, admin_controller.getUsersData);
+// THIS ENDPOINT TO BE LEFT INACTIVE UNTIL NEEDED
+// app.post('/api/admin-register', admin_controller.register);
 
 // ==============================================================
 if(process.env.NODE_ENV === 'production') {
