@@ -48,7 +48,8 @@ module.exports = {
             res.redirect('/dashboard');
           } else {
             // OTHERWIESE CREATE A NEW USER IN THE DB, AND RETURN THAT USER
-            return db.create_user([sub, firstName, lastName, email]).then( user => {
+            let dateCreated = new Date();
+            return db.create_user([sub, firstName, lastName, email, dateCreated]).then( user => {
               req.session.user = user[0];
               res.redirect('/dashboard');
             }).catch( err => console.log('auth_controller.connect - create user err'));

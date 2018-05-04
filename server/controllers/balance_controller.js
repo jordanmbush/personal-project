@@ -15,7 +15,6 @@ module.exports = {
     const { user_id } = req.session.user;
     // const user_id = 'github|34669268'; //TESTING - REMOVE!!!!!!!!!!!!!!!!!!!!!!!!!
     const balanceInfo = req.body;
-    console.log('balance: ', balanceInfo)
     const { date, amount } = balanceInfo;
     const db = req.app.get('db');
     // add_balance WILL DELETE ANY BALANCE THAT CONTAINS THE SAME DATE

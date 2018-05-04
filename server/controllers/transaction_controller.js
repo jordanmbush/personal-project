@@ -44,14 +44,13 @@ module.exports = {
     let transactions = req.body.transactionsArray;
     let addedTransactions = [];
     const db = req.app.get('db');
-    console.log("req-body: ", req.body)
     for(let i = 0; i < transactions.length; i++) {
-      const { name, amount, day, category, subCategory, type } = transactions[i];
+      const { name, amount, day, category, subCategory, transactionType } = transactions[i];
       
-      db.add_transaction([user_id, name, amount, day, category, subCategory, type]).then( transaction => {
+      db.add_transaction([user_id, name, amount, day, category, subCategory, transactionType]).then( transaction => {
         addedTransactions = addedTransactions.concat(transaction);
       }).catch( err => {
-        console.log('transaction_controller.js - addTransaction err: ', err);
+        console.log('transaction_controller.js - addTransactions err: ', err);
         res.status(500).send();
       });
     }
@@ -59,6 +58,7 @@ module.exports = {
     res.status(200).send();
   },
   deleteTransaction: (req, res) => {
+    console.log('=======================!!!!!!!!!!!!!==================')
     const { user_id } = req.session.user;
     // const user_id = 'github|34669268'; //TESTING - REMOVE!!!!!!!!!!!!!!!!!!!!!!!!!
     const id = req.params.id;

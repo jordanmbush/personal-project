@@ -537,9 +537,9 @@ export default class CreateBudgetView extends Component {
     return (
       <div className='create-budget-component'>
       <Header />
-        <div className='create-budget-title'>
+        {/* <div className='create-budget-title'>
           <h1>My Budget Template</h1>
-        </div>
+        </div> */}
         <div id='save-budget-button-container' className='save-budget-button-container'>
           <button id='save-budget-button' className='save-budget-button' disabled={this.state.saveButtonIsDisabled} onClick={this.saveBudgetTemplate}>Save Budget Template</button>
         </div>

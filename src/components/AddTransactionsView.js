@@ -261,7 +261,7 @@ export default class AddTransactionsView extends Component {
         const editTransactionButton = <button data-is-transaction={id || false} data-index={formattedTransactionKey} id={`${currentMonthTransactionKey}-edit-button`} onClick={(e) => this.toggleEditSaveTransactionButton(e.currentTarget)} className='edit-button'>Edit</button>
 
         dailyTransactions.push(
-          <div className='transaction-table-row' id={`${dayID}-${i}`}>
+          <div key={'daily-transaction-' + dayID + '-' + i} className='transaction-table-row' id={`${dayID}-${i}`}>
             <div className='transaction-info' onClick={() => this.toggleRowButtonsVisibility(`${dayID}-${i}`, `${currentMonthTransactionKey}-edit-button`)}>
               <div><input disabled id={`${currentMonthTransactionKey}-balance`} className='transaction-balance' onChange={e => this.updateTransactionValues(e)} value={currency(this.state.currentMonthTransactions[currentMonthTransactionKey].balance).format(true)}></input></div>
               <div><input disabled id={`${currentMonthTransactionKey}-name`} className='transaction-name' onChange={e => this.updateTransactionValues(e)} value={this.state.currentMonthTransactions[currentMonthTransactionKey].name}></input></div>
@@ -269,7 +269,7 @@ export default class AddTransactionsView extends Component {
               <div><input disabled id={`${currentMonthTransactionKey}-category`} className='transaction-category' onChange={e => this.updateTransactionValues(e)} value={this.state.currentMonthTransactions[currentMonthTransactionKey].category}></input></div>
               <div><input disabled id={`${currentMonthTransactionKey}-subCategory`} className='transaction-subcCategory' onChange={e => this.updateTransactionValues(e)} value={this.state.currentMonthTransactions[currentMonthTransactionKey].subCategory}></input></div>
             </div>
-            <div id={`${dayID}-${i}-buttons`} className='transaction-buttons-container row-hidden'>
+            <div key={`${dayID}-${i}-buttons`} id={`${dayID}-${i}-buttons`} className='transaction-buttons-container row-hidden'>
               <div className='income-radio radio-container'>
                 <label htmlFor={currentMonthTransactionKey + '-radio-income'}><i class="far fa-money-bill-alt"></i></label>
                 <input disabled id={`${currentMonthTransactionKey}-radio-income`}  type='radio' name={`${currentMonthTransactionKey}-transaction-type`} onChange={(e) => this.updateTransactionValues(e)} checked={this.state.currentMonthTransactions[currentMonthTransactionKey].transactionType === 'income'}></input>
