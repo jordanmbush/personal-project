@@ -43,26 +43,10 @@ export default class AddTransactionsView extends Component {
       currentMonthTransactions: [],
       newTransactions: []
     }
-    this.nextMonth = this.nextMonth.bind(this);
-    this.currentMonth = this.currentMonth.bind(this);
-    this.previousMonth = this.previousMonth.bind(this);
-    this.populateTransactionsByMonth = this.populateTransactionsByMonth.bind(this);
-    this.toggleTableRowVisibility = this.toggleTableRowVisibility.bind(this);
-    this.toggleEditSaveTransactionButton = this.toggleEditSaveTransactionButton.bind(this);
-    this.toggleRowButtonsVisibility = this.toggleRowButtonsVisibility.bind(this);
-    this.addTransaction = this.addTransaction.bind(this);
-    this.saveTransaction = this.saveTransaction.bind(this);
-    this.deleteTransaction = this.deleteTransaction.bind(this);
-    this.updateTransactionValues = this.updateTransactionValues.bind(this);
     // ===========================================
     this.getTrans = getTransactionsFromDB.bind(this);
     this.putTransactionsInState = initializeTransactions.bind(this);
     this.getTemplateTrans = getTemplateTransactions.bind(this);
-    this.getCategories = this.getCategories.bind(this);
-    this.getSubCategories = this.getSubCategories.bind(this);
-    this.getNewTransaction = this.getNewTransaction.bind(this);
-    this.getNewTransactionIndex = this.getNewTransactionIndex.bind(this);
-    this.setNewTransactionValue = this.setNewTransactionValue.bind(this);
     this.currentMonthHasTransactions = this.currentMonthHasTransactions.bind(this);
     this.convertBudgetItemsToTransactions = this.convertBudgetItemsToTransactions.bind(this);
   }
@@ -71,7 +55,7 @@ export default class AddTransactionsView extends Component {
     this.getTrans();
   }
 
-  getCategories() {
+  getCategories = () => {
     let categoriesJSX = _.keys(categories);
     categoriesJSX = categoriesJSX.map( key => {
       return (
@@ -80,7 +64,7 @@ export default class AddTransactionsView extends Component {
     })
     return categoriesJSX;
   }
-  getSubCategories(category) {
+  getSubCategories = (category) => {
     let subCategories = categories[category];
     let subCategoriesJSX = []
     if(subCategories) {
@@ -93,7 +77,7 @@ export default class AddTransactionsView extends Component {
     return subCategoriesJSX;
   }
   // =============================== CHANGE MONTH BUTTONS ===============================
-  nextMonth() {
+  nextMonth = () => {
     let month = this.state.selectedMonth;
     let year = this.state.selectedYear;
 
@@ -109,7 +93,7 @@ export default class AddTransactionsView extends Component {
     }, () => this.putTransactionsInState());
   }
 
-  currentMonth() {
+  currentMonth = () => {
     let month = (new Date()).getMonth();
     let year = (new Date()).getFullYear();
 
@@ -119,7 +103,7 @@ export default class AddTransactionsView extends Component {
     }, () => this.putTransactionsInState());
   }
 
-  previousMonth() {
+  previousMonth = () => {
     let month = this.state.selectedMonth;
     let year = this.state.selectedYear;
     month--;
@@ -134,12 +118,12 @@ export default class AddTransactionsView extends Component {
   }
 
   // ==========================================
-  getNewTransaction(id) {
+  getNewTransaction = (id) => {
     let newTransactions = this.state.newTransactions.slice();
     // RETURNS UNDEFINED IF NOT FOUND
     return newTransactions.find( transaction => transaction.id === id);
   }
-  setNewTransactionValue(target) {
+  setNewTransactionValue = (target) => {
     let newTransactions = this.state.newTransactions.slice();
     let value ='', prop = '', index = -1, id ='';
     
@@ -172,13 +156,13 @@ export default class AddTransactionsView extends Component {
     }
     this.setState({ newTransactions });
   }
-  getNewTransactionIndex(id) {
+  getNewTransactionIndex = (id) => {
     let newTransactions = this.state.newTransactions.slice();
     let index = newTransactions.findIndex( transaction => transaction.id === id );
     return index;
   }
 
-  currentMonthHasTransactions() {
+  currentMonthHasTransactions = () => {
     let monthNum = this.state.selectedMonth;
     let yearNum = this.state.selectedYear;
     let transactions = this.state.transactions.slice();
@@ -195,7 +179,7 @@ export default class AddTransactionsView extends Component {
   // =========================== GENERATE BUDGET TABLE =====================================
   // =======================================================================================
   
-  populateTransactionsByMonth(){
+  populateTransactionsByMonth = () => {
     let firstDayOfSelectedMonth = new Date(this.state.selectedYear, this.state.selectedMonth, 1 );
     let lastDayOfSelectedMonth = new Date(this.state.selectedYear, this.state.selectedMonth + 1, 0);
     // let transactions = this.state.fullTransactionSet.filter( transaction => {
@@ -367,7 +351,7 @@ export default class AddTransactionsView extends Component {
   // ===========================================================================
   // ================== ADD, EDIT, AND DELETE TRANSACTIONS =====================
   // ===========================================================================
-  updateTransactionValues(e) {
+  updateTransactionValues = (e) => {
     let index = parseInt(e.target.id.replace(/\D/g, ''));
     let prop = e.target.id.substring(index.toString().length + 1);
     let currentMonthTransactions = this.state.currentMonthTransactions.slice();
@@ -397,7 +381,7 @@ export default class AddTransactionsView extends Component {
     this.setState({ currentMonthTransactions });
   }
   // =========================================== EDIT ===========================================
-  toggleEditSaveTransactionButton(target) {
+  toggleEditSaveTransactionButton = (target) => {
     let id = parseInt(target.id.replace('-edit-button', ''));
     let isDisabled = true;
 
@@ -421,7 +405,7 @@ export default class AddTransactionsView extends Component {
     }
   }
 
-  saveTransaction(target) {
+  saveTransaction = (target) => {
     let id = parseInt(target.id.replace('-edit-button', ''));
     let transactionID = target.dataset.isTransaction;
 
@@ -474,7 +458,7 @@ export default class AddTransactionsView extends Component {
     }
   }
   // =========================================== DELETE ===========================================
-  deleteTransaction(target) {
+  deleteTransaction = (target) => {
     let id = target.id.replace('-delete-button', '');
     let transactionID = target.dataset.isTransaction;
     let indexInState = target.dataset.index;
@@ -498,7 +482,7 @@ export default class AddTransactionsView extends Component {
     }
   }
 
-  convertBudgetItemsToTransactions(deleteItemIndex = -1) {
+  convertBudgetItemsToTransactions = (deleteItemIndex = -1) => {
     let fullTransactionSetCopy = this.state.fullTransactionSet.slice();
     // GET ALL BUDGET TEMPLATE ITEMS FOR THE CURRENT MONTH
     let budgetTempateItems = fullTransactionSetCopy.filter( transaction => {
@@ -527,7 +511,7 @@ export default class AddTransactionsView extends Component {
   }
   
   // =========================================== ADD ===========================================
-  addTransaction(target) {
+  addTransaction = (target) => {
     // THE ID PROPERTY OF NEW TRANSACTIONS EQUALS THE DATE OF THE TRANSACTIONS. ID WILL BE USED AS THE DATE TO SEND TO THE SERVER
     let id = target.id.substring(0, target.id.indexOf('-add-button'));
     let newTransactions = this.state.newTransactions.slice();
@@ -549,7 +533,7 @@ export default class AddTransactionsView extends Component {
     }).catch( err => console.log('addTransactionView.js addTransaction err: ', err));
   }
   
-  toggleTableRowVisibility(target) {
+  toggleTableRowVisibility = (target) => {
     let id = target.id.replace('-header-row', '');
     let contentContainer = document.getElementById(id + '-content-container');
     
@@ -563,7 +547,7 @@ export default class AddTransactionsView extends Component {
     }
   }
 
-  toggleEntryRowVisibility(dayID) {
+  toggleEntryRowVisibility = (dayID) => {
     let entryRow = document.getElementById(dayID + '-entry-row');
     let toggleButton = document.getElementById(dayID + '-toggle-entry-row-button');
 
@@ -577,11 +561,9 @@ export default class AddTransactionsView extends Component {
       toggleButton.className = 'hide-fields'
     }
   }
-  toggleRowButtonsVisibility(dayID, editButtonID) {
+  toggleRowButtonsVisibility = (dayID, editButtonID) => {
     let buttonContainer = document.getElementById(dayID + '-buttons');
-    let buttonContainerClassList = buttonContainer.className.split(' ');
     let saveButton = document.getElementById(editButtonID);
-    let index = buttonContainerClassList.indexOf('row-hidden');
     
     if(buttonContainer.classList.contains('row-hidden')) {
       buttonContainer.classList.remove('row-hidden');
