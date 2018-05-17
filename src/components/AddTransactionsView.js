@@ -554,14 +554,12 @@ export default class AddTransactionsView extends Component {
     let contentContainer = document.getElementById(id + '-content-container');
     
     // 'transaction-row-content-container'
-    let contentContainerClassList = contentContainer.className.split(' ');
-
-    if(contentContainerClassList.indexOf('row-showing') !== -1) {
-      contentContainerClassList.splice(contentContainerClassList.indexOf('row-showing'), 1, 'row-hidden');
-      contentContainer.className = contentContainerClassList.join(' ');
-    } else if(contentContainerClassList.indexOf('row-hidden') !== -1) {
-      contentContainerClassList.splice(contentContainerClassList.indexOf('row-hidden'), 1, 'row-showing');
-      contentContainer.className = contentContainerClassList.join(' ');
+    if(contentContainer.classList.contains('row-showing')) {
+      contentContainer.classList.remove('row-showing');
+      contentContainer.classList.add('row-hidden');
+    } else {
+      contentContainer.classList.remove('row-hidden');
+      contentContainer.classList.add('row-showing');
     }
   }
 
@@ -569,20 +567,14 @@ export default class AddTransactionsView extends Component {
     let entryRow = document.getElementById(dayID + '-entry-row');
     let toggleButton = document.getElementById(dayID + '-toggle-entry-row-button');
 
-    let entryRowClassList = entryRow.className.split(' ');
+    entryRow.classList.toggle('row-hidden');
 
-    let index = entryRowClassList.indexOf('row-hidden');
-    
-    if(index !== -1) {
-      entryRowClassList.splice(entryRowClassList.indexOf('row-hidden'),1)
-      entryRow.className = entryRowClassList.join(' ');
-      toggleButton.innerText = 'Cancel';
-      toggleButton.className = 'hide-fields'
-    } else {
-      entryRowClassList.push('row-hidden');
-      entryRow.className = entryRowClassList.join(' ');
+    if(entryRow.classList.contains('row-hidden')) {
       toggleButton.innerText = '+ Add Transaction';
       toggleButton.className = 'show-fields'
+    } else {
+      toggleButton.innerText = 'Cancel';
+      toggleButton.className = 'hide-fields'
     }
   }
   toggleRowButtonsVisibility(dayID, editButtonID) {
@@ -591,13 +583,11 @@ export default class AddTransactionsView extends Component {
     let saveButton = document.getElementById(editButtonID);
     let index = buttonContainerClassList.indexOf('row-hidden');
     
-    if(index !== -1) {
-      buttonContainerClassList.splice(buttonContainerClassList.indexOf('row-hidden'),1)
-      buttonContainer.className = buttonContainerClassList.join(' ');
+    if(buttonContainer.classList.contains('row-hidden')) {
+      buttonContainer.classList.remove('row-hidden');
     } else {
       if(saveButton.innerText === 'Edit') {
-        buttonContainerClassList.push('row-hidden');
-        buttonContainer.className = buttonContainerClassList.join(' ');
+        buttonContainer.classList.add('row-hidden');
       }
     }
   }
