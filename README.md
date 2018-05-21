@@ -12,6 +12,11 @@ Monilibrium is a personal budgeting application using a full stack. This applica
 - chart.js - I use to show charting of user's transactions
 - express-session - used for session management
 
+## Hosting info
+- Hosted on an Ubuntu
+- Using ngynx as it's reverse proxy
+- PM2 to help with node server management
+
 ## Additional Info
 - Monilibrium was designed using the MVC pattern
 - Authentication is handled by Auth0
