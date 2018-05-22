@@ -21,3 +21,16 @@ Monilibrium is a personal budgeting application using a full stack. This applica
 - Monilibrium was designed using the MVC pattern
 - Authentication is handled by Auth0
   - Future versions will utilize bcrypt for secure authentication to allow for more flexibility
+
+## Screenshots
+
+### -Dashboard
+<img src="dashboard_mobile.png" width="250" />
+
+
+### -Budget Editor
+<img src="budget_mobile.png" width="250" />
+
+
+### -Transactions View
+<img src="transactions_mobile.png" width="250" />
