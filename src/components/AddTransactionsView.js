@@ -1,4 +1,8 @@
 import React, { Component } from 'react';
+import DailyTransaction from './transactionContainer';
+import AddTransactionButtons from './addTransactionButtons';
+import AddTransactionFields from './AddTransactionFields';
+import SummaryRow from './summaryRow';
 import axios from 'axios';
 import DateFunctions from './../helpers/DateFunctions';
 import Header from './Header';
@@ -52,7 +56,7 @@ export default class AddTransactionsView extends Component {
   }
 
   componentDidMount() {
-    this.getTrans();
+    getTransactionsFromDB.apply(this);
   }
 
   getCategories = () => {
@@ -121,7 +125,9 @@ export default class AddTransactionsView extends Component {
   getNewTransaction = (id) => {
     let newTransactions = this.state.newTransactions.slice();
     // RETURNS UNDEFINED IF NOT FOUND
-    return newTransactions.find( transaction => transaction.id === id);
+    console.log('id: ', id);
+    console.log('newTransactions: ', newTransactions);
+    return newTransactions.find( transaction => transaction.id === id) || {};
   }
   setNewTransactionValue = (target) => {
     let newTransactions = this.state.newTransactions.slice();
@@ -235,37 +241,28 @@ export default class AddTransactionsView extends Component {
       // ==================== FOR EVERY TRANSACTION OF THE DAY ====================
       // ==========================================================================
       for(let i = 0; i < billsForDay.length; i++) {
-        let { name, amount, transactionType, id, category, currentMonthTransactionKey, formattedTransactionKey } = billsForDay[i];
+        let { name, amount, transactionType, id, category, currentMonthTransactionKey: currKey, formattedTransactionKey } = billsForDay[i];
         billName = name;
         billAmount = amount;
 
         balance = billsForDay[i].balance;
         dailyTotal = currency(amount).add(dailyTotal).value;
-        const deleteTransactionButton = <button data-is-transaction={id || false} data-index={formattedTransactionKey} id={`${currentMonthTransactionKey}-delete-button`} onClick={(e) => this.deleteTransaction(e.currentTarget)} className='delete-button'><i className="fas fa-trash-alt"></i></button>
-        const editTransactionButton = <button data-is-transaction={id || false} data-index={formattedTransactionKey} id={`${currentMonthTransactionKey}-edit-button`} onClick={(e) => this.toggleEditSaveTransactionButton(e.currentTarget)} className='edit-button'>Edit</button>
-
+        const deleteTransactionButton = <button data-is-transaction={id || false} data-index={formattedTransactionKey} id={`${currKey}-delete-button`} onClick={(e) => this.deleteTransaction(e.currentTarget)} className='delete-button'><i className="fas fa-trash-alt"></i></button>
+        const editTransactionButton = <button data-is-transaction={id || false} data-index={formattedTransactionKey} id={`${currKey}-edit-button`} onClick={(e) => this.toggleEditSaveTransactionButton(e.currentTarget)} className='edit-button'>Edit</button>
+        
+        const currentMonthTransactions = this.state.currentMonthTransactions.slice();
         dailyTransactions.push(
-          <div key={'daily-transaction-' + dayID + '-' + i} className='transaction-table-row' id={`${dayID}-${i}`}>
-            <div className='transaction-info' onClick={() => this.toggleRowButtonsVisibility(`${dayID}-${i}`, `${currentMonthTransactionKey}-edit-button`)}>
-              <div><input disabled id={`${currentMonthTransactionKey}-balance`} className='transaction-balance' onChange={e => this.updateTransactionValues(e)} value={currency(this.state.currentMonthTransactions[currentMonthTransactionKey].balance).format(true)}></input></div>
-              <div><input disabled id={`${currentMonthTransactionKey}-name`} className='transaction-name' onChange={e => this.updateTransactionValues(e)} value={this.state.currentMonthTransactions[currentMonthTransactionKey].name}></input></div>
-              <div><input disabled id={`${currentMonthTransactionKey}-amount`} className='transaction-amount' onChange={e => this.updateTransactionValues(e)} value={currency(this.state.currentMonthTransactions[currentMonthTransactionKey].amount).value} type='number'></input></div>
-              <div><input disabled id={`${currentMonthTransactionKey}-category`} className='transaction-category' onChange={e => this.updateTransactionValues(e)} value={this.state.currentMonthTransactions[currentMonthTransactionKey].category}></input></div>
-              <div><input disabled id={`${currentMonthTransactionKey}-subCategory`} className='transaction-subcCategory' onChange={e => this.updateTransactionValues(e)} value={this.state.currentMonthTransactions[currentMonthTransactionKey].subCategory}></input></div>
-            </div>
-            <div key={`${dayID}-${i}-buttons`} id={`${dayID}-${i}-buttons`} className='transaction-buttons-container row-hidden'>
-              <div className='income-radio radio-container'>
-                <label htmlFor={currentMonthTransactionKey + '-radio-income'}><i class="far fa-money-bill-alt"></i></label>
-                <input disabled id={`${currentMonthTransactionKey}-radio-income`}  type='radio' name={`${currentMonthTransactionKey}-transaction-type`} onChange={(e) => this.updateTransactionValues(e)} checked={this.state.currentMonthTransactions[currentMonthTransactionKey].transactionType === 'income'}></input>
-              </div>
-              <div className='expense-radio radio-container'>
-                <label htmlFor={`${currentMonthTransactionKey}-radio-expense`}>Expense</label>
-                <input disabled id={currentMonthTransactionKey + '-radio-expense'} type='radio' name={`${currentMonthTransactionKey}-transaction-type`} onChange={(e) => this.updateTransactionValues(e)} checked={this.state.currentMonthTransactions[currentMonthTransactionKey].transactionType === 'expense'}></input>
-              </div>
-              {editTransactionButton}
-              {deleteTransactionButton}
-            </div>
-          </div>
+          <DailyTransaction 
+            key={currKey}
+            currKey={currKey}
+            dayID={dayID}
+            i={i}
+            currentMonthTransactions={currentMonthTransactions}
+            editTransactionButton={editTransactionButton}
+            deleteTransactionButton={deleteTransactionButton}
+            toggleRowButtonsVisibility={this.toggleRowButtonsVisibility}
+            updateTransactionValues={this.updateTransactionValues}
+          />
         );
       }
       // ============================================================================
@@ -286,26 +283,21 @@ export default class AddTransactionsView extends Component {
         bandedWeekClass += ' transaction-row-today'
       }
 
-      let dayBalanceStyle = {
-      }
-
-      balance < 0 ? dayBalanceStyle.color = 'red' : '';
-      
-      let dailySummaryRow = (
-        <div className={`transaction-table-daily-header-row ${bandedWeekClass}`} id={`${dayID}-header-row`} onClick={e => this.toggleTableRowVisibility(e.currentTarget)}>
-          <div className='transaction-table-date-column'>{DateFunctions.simpleDateFormat(day)}</div>
-          <div className='transaction-table-week-day-column'>{day.toString().split(' ')[0]}</div>
-          <div style={dayBalanceStyle} className='transaction-table-balance-column'>{currency(balance).format(true)}</div>
-          <div className='transaction-table-name-column'>{billsForDay.length > 1 && 'Multiple Transactions...' || billName}</div>
-          <div className='transaction-table-amount-column'>{currency(dailyTotal).format(true)}</div>
-        </div>
-      );
       // ===========================================================================
       // =============== PUSH ALL TRANSACTIONS TO RETURN VALUE =====================
       // ===========================================================================
       transactionTable.push(
-        <div className='transaction-table-row-container' id={dayID}>
-          {dailySummaryRow}
+        <div key={dayID} className='transaction-table-row-container' id={dayID}>
+          <SummaryRow
+            bandedWeekClass={bandedWeekClass}
+            dayID={dayID}
+            day={day}
+            dayBalanceStyle={balance < 0 ? {color: 'red'} : {}}
+            billsForDay={billsForDay}
+            billName={billName}
+            dailyTotal={dailyTotal}
+            toggleTableRowVisibility={this.toggleTableRowVisibility}
+          />
           <div className='transaction-row-content-container row-hidden' id={`${dayID}-content-container`}>
             {subTransactionHeader}
             {dailyTransactions}
@@ -313,33 +305,24 @@ export default class AddTransactionsView extends Component {
               <button id={dayID + '-toggle-entry-row-button'} className='show-fields' onClick={() => this.toggleEntryRowVisibility(dayID)}>+ Add Transactions</button>
             </div>
             <div className='transaction-table-entry-container row-hidden' id={dayID + '-entry-row'}>
-              <div className='data-fields entry-row'>
-                <div className='entry-field'><input id={dayID + '-entry-name'}      value={this.getNewTransaction(`${dayID}`) && this.getNewTransaction(`${dayID}`).name || ''} placeholder="name - e.g. 'Water'" onChange={e => this.setNewTransactionValue(e.target)}></input></div>
-                <div className='entry-field'><input id={dayID + '-entry-amount'}    value={this.getNewTransaction(`${dayID}`) && this.getNewTransaction(`${dayID}`).amount || ''} placeholder='amount' type='number' onChange={e => this.setNewTransactionValue(e.target)}></input></div>
-                <div className='entry-field'>
-                  <select id={dayID + '-entry-category'} value={this.getNewTransaction(`${dayID}`) && this.getNewTransaction(`${dayID}`).category || ''} onChange={e => this.setNewTransactionValue(e.target)}>
-                    <option selected> --category-- </option>
-                    {this.getCategories()}
-                  </select>
-                </div>
-                <div className='entry-field'>
-                  <select id={dayID + '-entry-subCategory'} value={this.getNewTransaction(`${dayID}`) && this.getNewTransaction(`${dayID}`).subCategory} onChange={e => this.setNewTransactionValue(e.target)}>
-                    <option selected> --subcategory-- </option>
-                    {this.getSubCategories(this.getNewTransaction(`${dayID}`) && this.getNewTransaction(`${dayID}`).category)}
-                  </select>
-                </div>
-              </div>
-              <div className='transaction-buttons-container button-fields entry-row'>
-                <div className='income-radio radio-container entry-field'>
-                  <label htmlFor={dayID + '-radio-income'}>Income</label>
-                  <input id={dayID + '-radio-income'}  type='radio' name={`${dayID}-transaction-type`} checked={this.getNewTransaction(`${dayID}`) && this.getNewTransaction(`${dayID}`).transactionType === 'income'} onChange={e => this.setNewTransactionValue(e.target)}></input>
-                </div>
-                <div className='expense-radio radio-container entry-field'>
-                  <label htmlFor={dayID + '-radio-expense'}>Expense</label>
-                  <input id={dayID + '-radio-expense'} type='radio' name={`${dayID}-transaction-type`} checked={this.getNewTransaction(`${dayID}`) && this.getNewTransaction(`${dayID}`).transactionType === 'expense'} onChange={e => this.setNewTransactionValue(e.target)}></input>
-                </div>
-                <button className='entry-field' id={dayID + '-add-button'} onClick={e => this.addTransaction(e.target)} >Add</button>
-              </div>
+              <AddTransactionFields
+                dayID={dayID}
+                setNewTransactionValue={this.setNewTransactionValue}
+
+                transName={this.getNewTransaction(dayID).name || ''}
+                transAmount={this.getNewTransaction(dayID).amount || ''}
+                transCategory={this.getNewTransaction(dayID).category || ''}
+                transSubCategory={this.getNewTransaction(dayID).subCategory || ''}
+                categories={this.getCategories()}
+                subCategories={this.getSubCategories(this.getNewTransaction(dayID) && this.getNewTransaction(dayID).category)}
+              />
+              <AddTransactionButtons
+                dayID={dayID}
+                isIncomeChecked={this.getNewTransaction(dayID) && this.getNewTransaction(dayID).transactionType === 'income'}
+                isExpenseChecked={this.getNewTransaction(dayID) && this.getNewTransaction(dayID).transactionType === 'expense'}
+                setNewTransactionValue={this.setNewTransactionValue}
+                addTransaction={this.addTransaction}
+              />
             </div>
           </div>
         </div>
